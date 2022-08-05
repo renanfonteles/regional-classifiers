@@ -1,5 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
+import plotly.offline as py
 
 
 def plot_data(X, is_notebook=True):
@@ -265,3 +266,27 @@ def plot_voronoi_cells(X, kmeans):
     fig.show(renderer="png")
 
     fig.write_image("chap2_kmeans_data_part_2.pdf", width=700, height=500)
+
+
+def render_boxplot(results, dataset_name, ks):
+    data = [{}] * (len(ks) + 1)
+
+    y_gls = results['GOLS'][dataset_name].values
+
+    data[0] = go.Box(y=y_gls, name=ks[0][2:], marker=dict(color='#2980b9'))
+
+    for i in range(2, len(ks)):
+        trace = go.Box(
+            y=results['LOLS'][dataset_name][ks[i]].values, name=ks[i][2:], marker=dict(color = '#2980b9')
+        )
+        data[i] = trace
+
+    layout = go.Layout(
+        title = "Accuracy vs number of clusters [{}]".format(dataset_name),
+        showlegend=False,
+        yaxis=dict(title="Accuracy on the test set"),
+        xaxis=dict(title="Number of clusters")
+    )
+
+    fig = go.Figure(data=data,layout=layout)
+    py.iplot(fig)
