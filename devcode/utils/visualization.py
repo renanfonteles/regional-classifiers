@@ -290,3 +290,60 @@ def render_boxplot(results, dataset_name, ks):
 
     fig = go.Figure(data=data,layout=layout)
     py.iplot(fig)
+
+
+def plot_validation_indices(dataset_name, validation_indices):
+    data = []
+    for index_name, results_vec in validation_indices.items():
+        # for validation_index in validation_indices:
+        # print(index_name)
+        # print(results_vec[dataset_name])
+        data.append(go.Scatter(
+            x=[i for i in range(2, len(results_vec[dataset_name]) + 2)],
+            y=results_vec[dataset_name],
+            mode='lines+markers',
+            name="{} index".format(index_name)))
+
+    layout = go.Layout(
+        title="Indices vs k [{} dataset]".format(dataset_name),
+        legend=dict(orientation="h", y=-.05),
+        xaxis=dict(title="Number of clusters (k)"),
+        yaxis=dict(title="Indices values")
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    py.iplot(fig)
+
+
+def plot_kmeans(kmeans, X):
+    data = []
+    if X is not None:
+        datapoints = go.Scatter(
+            x=X[:, 0],
+            y=X[:, 1],
+            mode='markers',
+            name='data',
+            marker=dict(
+                size=5,
+                color='#03A9F4'
+            )
+        )
+        data.append(datapoints)
+
+    kmeans_clusters = go.Scatter(
+        x=kmeans.cluster_centers_[:, 0],
+        y=kmeans.cluster_centers_[:, 1],
+        mode='markers',
+        name='kmeans clusters',
+        marker=dict(size=10, color='#673AB7')
+    )
+    data.append(kmeans_clusters)
+
+    layout = go.Layout(
+        title="Data + KMeans clusters",
+        xaxis=dict(title="$x_1$"),
+        yaxis=dict(title="$x_2$"),
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    py.iplot(fig)
