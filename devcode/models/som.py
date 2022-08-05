@@ -108,11 +108,13 @@ class SOM:
     def index1Dto2D(self, index):  # convert index of neurons parameter matrix to the 2D grid index
         return np.asarray([np.ceil((index + 1) / self.nRows) - 1, index % self.nRows], dtype='int').T
 
-    def get_winner(self, x, dim=2):
+    def get_winner(self, x, dim=2, dist_matrix=False):
         dist_2 = np.sum((self.neurons - x) ** 2, axis=1)  # norm**2
-        temp = np.argmin(dist_2)
+        temp   = np.argmin(dist_2)
         winner = self.index1Dto2D(temp) if dim == 2 else temp
-        return winner
+        result = winner if dist_matrix == False else (winner, dist_2)
+
+        return result
 
     def h_neighbor(self, idx_1, idx_2, sigma):
         dist_2 = np.sum((idx_2 - idx_1) ** 2, axis=1)  # norm**2
