@@ -5,7 +5,7 @@ from sklearn import linear_model
 from sklearn.cluster import KMeans
 from copy import copy
 
-from local_learning import BiasModel
+from devcode.models.local_learning import BiasModel
 
 
 class RegionalModel:

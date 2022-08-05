@@ -1,22 +1,35 @@
 # loading datasets
 import pandas as pd
 
+base_path = 'datasets'
+
+vc2c_path = f"{base_path}/vertebral_column/column_2C.dat"
+vc3c_path = f"{base_path}/vertebral_column/column_3C.dat"
+
+wf24f_path = f"{base_path}/wall_following/sensor_readings_24.data"
+wf4f_path  = f"{base_path}/wall_following/sensor_readings_4.data"
+wf2f_path  = f"{base_path}/wall_following/sensor_readings_2.data"
+
+pk_path  = f"{base_path}/parkinson/parkinsons.data"
+
 # Vertebral Column
+
 # dataset for classification between Normal (NO) and Abnormal (AB)
-vc2c = pd.read_csv('datasets/vertebral_column/column_2C.dat', delim_whitespace=True, header=None)
+vc2c = pd.read_csv(vc2c_path, delim_whitespace=True, header=None)
+
 # dataset for classification between DH (Disk Hernia), Spondylolisthesis (SL) and Normal (NO)
-vc3c = pd.read_csv('datasets/vertebral_column/column_3C.dat', delim_whitespace=True, header=None)
+vc3c = pd.read_csv(vc3c_path, delim_whitespace=True, header=None)
 
 # Wall-Following
 # dataset with all 24 ultrassound sensors readings
-wf24f = pd.read_csv('datasets/wall_following/sensor_readings_24.data', header=None)
+wf24f = pd.read_csv(wf24f_path, header=None)
 # dataset with simplified 4 readings (front, left, right and back)
-wf4f  = pd.read_csv('datasets/wall_following/sensor_readings_4.data',  header=None)
+wf4f  = pd.read_csv(wf4f_path, header=None)
 # dataset with simplified 2 readings (front and left)
-wf2f  = pd.read_csv('datasets/wall_following/sensor_readings_2.data',  header=None)
+wf2f  = pd.read_csv(wf2f_path, header=None)
 
 # Parkinson (31 people, 23 with Parkinson's disease (PD))
-temp = pd.read_csv('datasets/parkinson/parkinsons.data')
+temp = pd.read_csv(pk_path)
 labels = temp.columns.values.tolist()
 new_labels = [label for label in labels if label not in ('name')] # taking off column 'name'
 pk = temp[new_labels]

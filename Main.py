@@ -1,6 +1,6 @@
 import numpy as np
 
-from som import SOM
+from devcode.models.som import SOM
 from sklearn.datasets import load_digits
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler

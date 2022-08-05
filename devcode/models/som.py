@@ -54,9 +54,10 @@ class SOM:
             self.ssdHist = np.zeros((nEpochs + 1))
             self.ssdHist[0] = SSD_new  # initial SSD, from random parameters
 
-        sigma = sigma0
-        alpha = alpha0
+        sigma   = sigma0
+        alpha   = alpha0
         inertia = np.inf  # initial value of inertia
+
         batchSize = min(len(X), batchSize)  # adjusting ill defined batchSize
         for epoch in range(nEpochs):
             # Updating alpha and sigma
@@ -91,8 +92,10 @@ class SOM:
             # breaking if tolerance reached before nEpochs
             if inertia < tol:
                 # history cutting
-                if saveNeuronsHist: self.neuronsHist = self.neuronsHist[0:epoch + 2]
-                if saveSSDHist:     self.ssdHist = self.ssdHist[0:epoch + 2]
+                if saveNeuronsHist:
+                    self.neuronsHist = self.neuronsHist[0:epoch + 2]
+                if saveSSDHist:
+                    self.ssdHist = self.ssdHist[0:epoch + 2]
                 break
 
     def SSD(self, X):

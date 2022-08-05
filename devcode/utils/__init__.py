@@ -52,3 +52,19 @@ def is_over():
 
 def printDateTime():
     print(datetime.datetime.now())
+
+
+def load_csv_as_pandas(path):
+    import glob
+    import pandas as pd
+
+    all_files = glob.glob(path + "/*.csv")
+
+    li = []
+    for filename in all_files:
+        df = pd.read_csv(filename, index_col=None, header=0)
+        li.append(df)
+
+    df_out = pd.concat(li, axis=0, ignore_index=True)
+
+    return df_out

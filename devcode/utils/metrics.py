@@ -26,6 +26,7 @@ def delta(ck, cl):
 
     return np.min(values)
 
+
 def big_delta(ci):
     values = np.zeros([len(ci), len(ci)])
 
@@ -101,7 +102,7 @@ def dunn_fast(points, labels):
     return di
 
 
-def  big_s(x, center):
+def big_s(x, center):
     len_x = len(x)
     total = 0
 
@@ -218,3 +219,54 @@ def CH(kmeans, points):
     K = len(kmeans.cluster_centers_)  # number os clusters
     ch = (trace(Bk) / (K - 1)) / (trace(Wk) / (N - K))
     return ch
+
+####################################### ---------------------------- ##########################
+
+
+from math import log
+from scipy.spatial.distance import cdist
+
+
+def IC_core(X, labels_pred):
+    unique_labels = np.unique(labels_pred)
+    N = len(X)
+    P = len(unique_labels) * X.shape[1]
+
+    # Mean Squared Quantization Error
+    MSQE = 0
+    for label in unique_labels:
+        X_cluster = X[labels_pred == label]
+        cluster = np.mean(X_cluster, axis=0)
+        MSQE += np.sum((X_cluster - cluster) ** 2)
+    MSQE = (1 / N) * MSQE
+
+    lhs = N * log(MSQE / N)  # left-hand side
+
+    return (N, P, lhs)
+
+
+# Final Prediction Error
+def FPE(X, labels_pred):
+    N, P, lhs = IC_core(X, labels_pred)
+    if ((N + P) / (N - P)) <= 0:  # not define in math the rhs
+        return np.inf
+    else:
+        return lhs + N * log((N + P) / (N - P))
+
+
+# Akaike Information Criteria
+def AIC(X, labels_pred):
+    N, P, lhs = IC_core(X, labels_pred)
+    return lhs + 2 * P
+
+
+# Bayesian Information Criteria
+def BIC(X, labels_pred):
+    N, P, lhs = IC_core(X, labels_pred)
+    return lhs + P * log(N)
+
+
+# Minimum Description Length
+def MDL(X, labels_pred):
+    N, P, lhs = IC_core(X, labels_pred)
+    return lhs + (P / 2) * log(N)
