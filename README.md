@@ -18,7 +18,7 @@ Code, data and models for manuscript "Pattern Classification Based on Regional M
 
 ### TODO
 
- [ ] Fig 8, 9, 10 (Main-paper-results part 1, 2 e 3) - TODO: Gerar tabelas que concidam com o artigo
- [ ] Definir orientações para geração de resultados com diferentes configurações (datasets, modelos, etc)
- [ ] Definir notebook referente as figuras 5 e 6
- [ ] Comentar código e notebooks
+ - [ ] Fig 8, 9, 10 (Main-paper-results part 1, 2 e 3) - TODO: Gerar tabelas que concidam com o artigo
+ - [ ] Definir orientações para geração de resultados com diferentes configurações (datasets, modelos, etc)
+ - [ ] Definir notebook referente as figuras 5 e 6
+ - [ ] Comentar código e notebooks
