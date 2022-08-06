@@ -5,10 +5,9 @@ from sklearn.model_selection import train_test_split
 
 from devcode.models.local_learning import LocalModel
 from devcode.utils import dummie2multilabel, cm2acc, scale_feat
-from load_dataset import datasets
 
 
-def run_simulation(dataset_name, kmeans, clf_model, test_size=0.2):
+def run_simulation(datasets, dataset_name, kmeans, clf_model, test_size=0.2):
     X = datasets[dataset_name]['features'].values
     Y = datasets[dataset_name]['labels'].values
 
