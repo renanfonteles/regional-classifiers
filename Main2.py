@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from code.utils import load_csv_as_pandas
-from code.utils.evaluation import cm2f1, cm2acc, cm2sen, cm2esp
+from devcode.utils import load_csv_as_pandas
+from devcode.utils.evaluation import cm2f1, cm2acc, cm2sen, cm2esp
 
 df = {
     'global'    : load_csv_as_pandas(path="results/local-results/cbic/temp_glssvm_cbic"),

@@ -54,7 +54,7 @@ def printDateTime():
     print(datetime.datetime.now())
 
 
-def load_csv_as_pandas(path):
+def load_csv_as_pandas(path, sort_flag=False):
     import glob
     import pandas as pd
 
@@ -65,7 +65,10 @@ def load_csv_as_pandas(path):
         df = pd.read_csv(filename, index_col=None, header=0)
         li.append(df)
 
-    df_out = pd.concat(li, axis=0, ignore_index=True)
+    df_results = pd.concat(li, axis=0, ignore_index=True)
 
-    return df_out
+    if sort_flag:
+        df_results.sort_values(by='dataset_name')
+
+    return df_results
 

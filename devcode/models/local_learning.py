@@ -19,7 +19,7 @@ class LocalModel:
 
     def __init__(self, ClusterAlg, ModelAlg):
         self.ClusterAlg = ClusterAlg
-        self.ModelAlg = ModelAlg
+        self.ModelAlg   = ModelAlg
 
         self.clusters = None
         self.models = None
