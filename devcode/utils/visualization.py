@@ -347,3 +347,12 @@ def plot_kmeans(kmeans, X):
 
     fig = go.Figure(data=data, layout=layout)
     py.iplot(fig)
+
+
+def plot_datapoints(X, title):
+    fig = go.Figure(data=go.Scatter(x=X[:, 0], y=X[:, 1], mode='markers'))
+    fig.update_layout({
+        'title': title
+    })
+
+    fig.show("notebook")

@@ -8,7 +8,7 @@ def scale_feat(X_train, X_test, scaleType='min-max'):
     """ Function to scale data """
 
     if scaleType == 'min-max' or scaleType == 'std':
-        X_tr_norm = np.copy(X_train) # making a copy to leave original available
+        X_tr_norm = np.copy(X_train)    # making a copy to leave original available
         X_ts_norm = np.copy(X_test)
         scaler = MinMaxScaler() if scaleType == 'min-max' else StandardScaler()
         scaler.fit(X_tr_norm)
