@@ -277,19 +277,39 @@ def render_boxplot(results, dataset_name, ks):
 
     for i in range(2, len(ks)):
         trace = go.Box(
-            y=results['LOLS'][dataset_name][ks[i]].values, name=ks[i][2:], marker=dict(color = '#2980b9')
+            y=results['LOLS'][dataset_name][ks[i]].values, name=ks[i][2:], marker=dict(color='#2980b9')
         )
         data[i] = trace
 
     layout = go.Layout(
-        title = "Accuracy vs number of clusters [{}]".format(dataset_name),
+        title="Accuracy vs number of clusters [{}]".format(dataset_name),
         showlegend=False,
         yaxis=dict(title="Accuracy on the test set"),
         xaxis=dict(title="Number of clusters")
     )
 
-    fig = go.Figure(data=data,layout=layout)
+    fig = go.Figure(data=data, layout=layout)
     py.iplot(fig)
+
+
+def render_boxplot_train_test(tr_data, ts_data, title, metric_name="Accuracy"):
+    train_box = go.Box(y=tr_data, name="Training", boxmean='sd')
+    test_box  = go.Box(y=ts_data, name="Testing", boxmean='sd')
+
+    layout = go.Layout(title=title, showlegend=True,
+                       yaxis=dict(title=metric_name), xaxis=dict(title="Dataset"))
+
+    fig = go.Figure(data=[train_box, test_box], layout=layout)
+    fig.show()
+
+
+def render_boxplot_with_histogram_train_test(tr_data, ts_data, title, metric_name="Accuracy", bin_size=10):
+    import plotly.figure_factory as ff
+
+    # Create distplot with custom bin_size
+    fig = ff.create_distplot([tr_data, ts_data], ['Training', 'Testing'], bin_size=bin_size)
+    fig.update_layout(title=title, xaxis_title=metric_name, yaxis_title='Frequency')
+    fig.show()
 
 
 def plot_validation_indices(dataset_name, validation_indices):
@@ -356,3 +376,6 @@ def plot_datapoints(X, title):
     })
 
     fig.show("notebook")
+
+
+
