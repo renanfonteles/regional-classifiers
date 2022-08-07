@@ -5,12 +5,13 @@ Code, data and models for manuscript "Pattern Classification Based on Regional M
 ### TODO
  - [ ] Gerar tabelas referente ao Experimento III (Notebook Main3)
  - [ ] Corrigir Extra2-Preliminary results [G-LSSVM and L-LSSVM].ipynb
+ - [ ] Corrigir Extra7-regional-classifier (Simple run).ipynb
  - [ ] Inserir código e resultados referente aos Experimentos I e II (Notebooks Main1 e Main2)
- - [ ] Definir quais notebooks "Extras" ou "Scripts" vão ser incluídos ao "Main"
+ - [ ] Definir quais notebooks "Extras" vão ser incluídos ao "Main"
  - [ ] Definir orientações para geração de resultados com diferentes configurações (datasets, modelos, etc)
  - [ ] Comentar código e notebooks
  
- **Obs:** Notebooks iniciados como "Main" será incluído ao Code Ocean (CO). Notebooks iniciados com "Extra" e "Script" precisam ser avaliados para ver se vai para o "Main" ou se servirão como apêndices.
+ **Obs:** Notebooks iniciados como "Main" serão incluídos ao Code Ocean (CO). Notebooks iniciados com "Extra" precisam ser avaliados para ver se vai para o "Main" ou se servirão como apêndices.
 
 ### Dependencies
 
