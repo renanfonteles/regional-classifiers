@@ -30,12 +30,12 @@ Code, data and models for manuscript "Pattern Classification Based on Regional M
 
 | Subsection                                                               | Output                                            |
 |--------------------------------------------------------------------------|---------------------------------------------------|
-| (Subsection 4.3.1) **Experiment I:** global vs regional LSC-LBF              | <ul><li>Table 3</li><li>Figures 5 and 6</li></ul> |
-| (Subsection 4.3.2) **Experiment II:** influence of the number of local regions <br /> in classification performance  | <ul><li>Figure 7</li></ul> |
+| (Subsection 4.3.1) **Experiment I:** global vs regional LSC-LBF <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)              | <ul><li>Table 3</li><li>Figures 5 and 6</li></ul> |
+| (Subsection 4.3.2) **Experiment II:** influence of the number of local regions <br /> in classification performance <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)  | <ul><li>Figure 7</li></ul> |
 
 #### (Section 4.4) Part 2: global vs local-regional non-linear classification model
 
 | Subsection                                                                                                               | Output                                   |
 |------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| (Subsection 4.4.4) **Experiment III:** global vs local vs regional LSSVM                                                   | <ul><li>Tables 5, 6 and 7</li><li> Figures 8 and 9</li></ul> |
-| (Subsection 4.4.5) **Experiment IV:** optimal selection of number of local regions <br />based on ensemble of clustering indices | <ul><li>Figure 10</li></ul>                              |
+| (Subsection 4.4.4) **Experiment III:** global vs local vs regional LSSVM <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)                                                   | <ul><li>Tables 5, 6 and 7</li><li> Figures 8 and 9</li></ul> |
+| (Subsection 4.4.5) **Experiment IV:** optimal selection of number of local regions <br />based on ensemble of clustering indices <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)</span> | <ul><li>Figure 10</li></ul>                              |
