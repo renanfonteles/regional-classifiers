@@ -37,5 +37,5 @@ Code, data and models for manuscript "Pattern Classification Based on Regional M
 
 | Subsection                                                                                                               | Output                                   |
 |------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| (Subsection 4.4.4) **Experiment III:** global vs local vs regional LSSVM                                                   | <ul><li>Tables 5, 6 and 7</li><li> Figures 8, 9 and 10</li></ul> |
+| (Subsection 4.4.4) **Experiment III:** global vs local vs regional LSSVM                                                   | <ul><li>Tables 5, 6 and 7</li><li> Figures 8 and 9</li></ul> |
 | (Subsection 4.4.5) **Experiment IV:** optimal selection of number of local regions <br />based on ensemble of clustering indices | <ul><li>Figure 10</li></ul>                              |
