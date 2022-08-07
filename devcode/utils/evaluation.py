@@ -249,6 +249,68 @@ def eval_LLSSVM(datasets, filename, header, case, scaleType, test_size, hps_case
 # results_df = eval_LLSSVM(cases[0])
 
 
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
+from functools import partial
+from multiprocessing import Pool
+
+
+# def evalRLM(datasets, case):
+#     dataset_name = case['dataset_name']
+#     random_state = case['random_state']
+#     som_params = case['som_params']
+#
+#     X = datasets[dataset_name]['features'].values
+#     Y = datasets[dataset_name]['labels'].values
+#
+#     # Train/Test split
+#     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_size, random_state=random_state)
+#     # scaling features
+#     X_tr_norm, X_ts_norm = scale_feat(X_train, X_test, scaleType=scaleType)
+#
+#     N = len(X_tr_norm)  # number of datapoints in the train split
+#     l = ceil((5 * N ** .5) ** .5)  # side length of square grid of neurons
+#
+#     som = SOM(l, l)
+#
+#     C = l ** 2  # number of SOM neurons in the 2D grid
+#     k_values = [i for i in range(2, ceil(np.sqrt(C)))]  # 2 to sqrt(C)
+#     cluster_params = {
+#         'n_clusters': {'metric': DB,  # when a dictionary is pass a search begins
+#                        'criteria': np.argmin,  # search for smallest DB score
+#                        'k_values': k_values},  # around the values provided in 'k_values'
+#         'n_init': 10,  # number of initializations
+#         'init': 'random'
+#         # 'n_jobs':     0
+#     }
+#
+#     linearModel = linear_model.LinearRegression()
+#
+#     rlm = RegionalModel(som, linearModel)
+#     rlm.fit(X=X_tr_norm, Y=y_train,
+#             SOM_params=som_params,
+#             Cluster_params=cluster_params)
+#
+#     # Evaluating in the train set
+#     y_tr_pred = rlm.predict(X_tr_norm)
+#     y_tr_pred = np.round(np.clip(y_tr_pred, 0, 1))  # rounding prediction numbers
+#
+#     cm_tr = confusion_matrix(dummie2multilabel(y_train),
+#                              dummie2multilabel(y_tr_pred)
+#                              ).reshape(-1)  # matrix => array
+#
+#     # Evaluating in the test set
+#     y_ts_pred = rlm.predict(X_ts_norm)
+#     y_ts_pred = np.round(np.clip(y_ts_pred, 0, 1))  # rounding prediction numbers
+#
+#     cm_ts = confusion_matrix(dummie2multilabel(y_test),
+#                              dummie2multilabel(y_ts_pred)
+#                              ).reshape(-1)  # matrix => array
+#
+#     data = [dataset_name, random_state] + list(som_params.values()) + [cm_tr] + [cm_ts]
+#     return data
+
+
 def cm2acc(cm):
     return np.trace(cm) / np.sum(cm)
 
