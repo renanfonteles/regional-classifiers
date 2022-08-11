@@ -9,7 +9,9 @@ from devcode.models.local_learning import BiasModel
 
 
 class RegionalModel:
-    'Class of Regional Models.'
+    """
+        Class of Regional Models.
+    """
 
     def __init__(self, SOM_class, Model_class, Cluster_class=None):
         self.SOM = SOM_class

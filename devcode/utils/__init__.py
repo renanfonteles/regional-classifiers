@@ -1,7 +1,58 @@
 import datetime
 import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
+
+class DataFrameUtils:
+    @staticmethod
+    def extract_ordered_case(df, df_params, s_params):
+        n_params = len(s_params)
+        _filter_params = [(df[df_params[i]] == s_params[i]) for i in range(n_params)]
+
+        combined_filter = _filter_params[0]
+
+        for _filter in _filter_params:
+            combined_filter = combined_filter & _filter
+
+        df_case = df.loc[combined_filter]
+
+        return df_case
+
+
+def data_preprocessing(data):
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+    temp   = scaler.fit_transform(data.data)
+
+    pca = PCA(n_components=2)
+    X   = pca.fit_transform(temp)
+
+    return X
+
+
+def process_labels(y_train):
+    # solving multilabel problem in wall-following data set
+    y_temp = y_train
+    if y_train.ndim == 2:
+        if y_train.shape[1] >= 2:
+            y_temp = dummie2multilabel(y_train)
+
+    return y_temp
+
+
+def collect_data(datasets, dataset_name, random_state, test_size, scale_type):
+    X = datasets[dataset_name]['features'].values
+    Y = datasets[dataset_name]['labels'].values
+
+    # Train/Test split
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_size, random_state=random_state,
+                                                        stratify=np.unique(Y, axis=1))
+    # scaling features
+    X_tr_norm, X_ts_norm = scale_feat(X_train, X_test, scaleType=scale_type)
+
+    return X_tr_norm, y_train, X_ts_norm, y_test
 
 
 def scale_feat(X_train, X_test, scaleType='min-max'):
@@ -72,3 +123,16 @@ def load_csv_as_pandas(path, sort_flag=False):
 
     return df_results
 
+
+def initialize_file(filename, header):
+    from pathlib import Path
+    simulation_file = Path(filename)
+
+    import csv
+
+    # open the file in the write mode
+    with open(filename, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+
+    return simulation_file

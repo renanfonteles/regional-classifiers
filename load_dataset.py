@@ -32,10 +32,10 @@ wf4f  = pd.read_csv(wf4f_path, header=None)
 wf2f  = pd.read_csv(wf2f_path, header=None)
 
 # Parkinson (31 people, 23 with Parkinson's disease (PD))
-temp = pd.read_csv(pk_path)
-labels = temp.columns.values.tolist()
+temp       = pd.read_csv(pk_path)
+labels     = temp.columns.values.tolist()
 new_labels = [label for label in labels if label not in ('name')] # taking off column 'name'
-pk = temp[new_labels]
+pk         = temp[new_labels]
 
 
 pk_features = pk.columns.tolist()
@@ -59,17 +59,18 @@ identified when all dummies variables are zero.
 import numpy as np
 
 # printing datasets info
-print("{:10}{:18}{:}".format(
-        'Dataset:',
-        'Features.shape:',
-        '# of classes:',
-        ))
-for dataset_name, data in datasets.items():
-    print("{:9} {:17} {:}".format(
-        dataset_name,
-        str(data['features'].shape),
-        len(np.unique(data['labels'].values, axis=0))
-        ))
+
+# print("{:10}{:18}{:}".format(
+#         'Dataset:',
+#         'Features.shape:',
+#         '# of classes:',
+#         ))
+# for dataset_name, data in datasets.items():
+#     print("{:9} {:17} {:}".format(
+#         dataset_name,
+#         str(data['features'].shape),
+#         len(np.unique(data['labels'].values, axis=0))
+#         ))
 
 
 def print_available_datasets():
@@ -93,7 +94,7 @@ def select_dataset(ds_name):
     else:
         datapoints = datasets[ds_name]
         title      = f"{ds_name} dataset"
-        X          = data['features'].values.copy()
+        X          = datapoints['features'].values.copy()
         X, _       = scale_feat(X, X, scaleType='min-max')
 
     return X, title

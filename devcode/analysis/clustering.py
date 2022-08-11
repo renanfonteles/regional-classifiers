@@ -3,12 +3,12 @@ import plotly.graph_objects as go
 
 from load_dataset import datasets
 
-from sklearn.model_selection import train_test_split
 from sklearn.cluster import KMeans
 from sklearn import metrics
 
 from devcode.utils.metrics import dunn_fast, FPE, AIC, BIC, MDL, FPE
-from devcode.utils import scale_feat, dummie2multilabel
+from devcode.utils import process_labels, collect_data
+from devcode.models.local_learning import BiasModel
 
 from IPython.core.display import display, HTML
 
@@ -127,20 +127,10 @@ def eval_cluster(cluster_metrics, X, labels_true, labels_pred):
 
 def evaluate_clusters(test_size, scaleType):
     for dataset_name in datasets:
-        X = datasets[dataset_name]['features'].values
-        Y = datasets[dataset_name]['labels'].values
+        X_tr_norm, y_train, X_ts_norm, y_test = collect_data(datasets, dataset_name, random_state=0,
+                                                             test_size=test_size, scale_type=scaleType)
 
-        # Train/Test split
-        X_train, X_test, y_train, y_test = train_test_split(X, Y, stratify=np.unique(Y, axis=1),
-                                                            test_size=test_size, random_state=0)
-        # scaling features
-        X_tr_norm, X_ts_norm = scale_feat(X_train, X_test, scaleType=scaleType)
-
-        # solving multilabel problem in wall-following data set
-        y_temp = y_train
-
-        if y_train.ndim == 2:
-            if y_train.shape[1] >= 2: y_temp = dummie2multilabel(y_train)
+        y_temp = process_labels(y_train)
 
         N  = len(X_tr_norm)
         ks = np.arange(2, int(N ** (1 / 2)) + 1).tolist()
@@ -186,21 +176,10 @@ def evaluate_clusters(test_size, scaleType):
 
 def find_optimal_k_per_dataset(test_size, scaleType):
     for ds_name in datasets:
-        print(ds_name)
+        X_tr_norm, y_train, X_ts_norm, y_test = collect_data(datasets, ds_name, random_state=0,
+                                                             test_size=test_size, scale_type=scaleType)
 
-        X = datasets[ds_name]['features'].values
-        Y = datasets[ds_name]['labels'].values
-
-        # Train/Test split
-        X_train, X_test, y_train, y_test = train_test_split(X, Y, stratify=np.unique(Y, axis=1),
-                                                            test_size=test_size, random_state=0)
-        # scaling features
-        X_tr_norm, X_ts_norm = scale_feat(X_train, X_test, scaleType=scaleType)
-
-        # solving multilabel problem in wall-following data set
-        y_temp = y_train
-        if y_train.ndim == 2:
-            if y_train.shape[1] >= 2: y_temp = dummie2multilabel(y_train)
+        y_temp = process_labels(y_train)
 
         N = len(X_tr_norm)
         ks = np.arange(2, int(N ** (1 / 2)) + 1).tolist()
@@ -230,6 +209,7 @@ def _hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=False,
                 column_name = "$k_{opt}$" + " [{}]".format(metric_names[j])
                 if df_dataset[column_name].values[i] == df_dataset["$k_{opt}$ [CV]"].values[i]:
                     y[j] += 1
+
         fig = go.Figure()
         for i in range(len(x)):
             fig.add_trace(go.Bar(x=[x[i]], y=[y[i]], text=y[i], textposition='auto'))
@@ -354,7 +334,6 @@ def k_optimal_histogram_local_vs_regional(df):
         df_local    = df['local'].loc[df['local']['dataset_name'] == dataset_name]
         df_regional = df['regional'].loc[df['regional']['dataset_name'] == dataset_name]
 
-        animals = ['giraffes', 'orangutans', 'monkeys']
         fig = go.Figure(data=[
             go.Bar(
                 name='L-LSSVM',
@@ -394,3 +373,43 @@ def k_optimal_histogram_local_vs_regional(df):
         fig.write_image("images/r_l-lssvm_k_opt_dist_{}.pdf".format(dataset_name))
 
         display(HTML('<hr>'))
+
+
+def find_optimal_clusters(lm, suggestions, validation_scores, best_hps_list):
+    k_opt           = len(lm.models)
+    n_empty_regions = len(lm.empty_regions)
+    n_homogeneous_regions = 0
+
+    for i in range(len(lm.models)):
+        if isinstance(lm.models[i], BiasModel):
+            n_homogeneous_regions += 1
+
+    # Organizing suggestion of the cluster metrics
+    temp = [np.nan] * 2 * len(cluster_val_metrics)
+    count = 0
+    for metric in cluster_val_metrics:
+        temp[count] = best_hps_list[
+            np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['gamma']
+        temp[count + 1] = best_hps_list[
+            np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['sigma']
+        count += 2
+
+    empty_and_homo = [n_empty_regions, n_homogeneous_regions]
+    valid_metrics  = [validation_scores[np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0], 1]
+                      for metric in cluster_val_metrics]
+
+    return empty_and_homo, valid_metrics
+
+
+def organize_cluster_metrics(best_hps_list, validation_scores, suggestions):
+    # Organizing suggestion of the cluster metrics
+    temp = [np.nan] * 2 * len(cluster_val_metrics)
+    count = 0
+    for metric in cluster_val_metrics:
+        temp[count] = best_hps_list[
+            np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['gamma']
+        temp[count + 1] = best_hps_list[
+            np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['sigma']
+        count += 2
+
+    return temp

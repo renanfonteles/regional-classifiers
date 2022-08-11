@@ -27,12 +27,15 @@ class LocalModel:
 
         self.empty_regions = []
 
-    def fit(self, X, Y, verboses=0):
+    def fit(self, X, Y, Cluster_params=None, verboses=0):
         self.targets_dim_ = Y.shape[1]  # dimension of target values
 
         # Clustering
         if verboses == 1:
             print("Start of clusterization: {}".format(datetime.datetime.now()))
+
+        if Cluster_params:
+            self.ClusterAlg = self.ClusterAlg(**Cluster_params)
 
         self.ClusterAlg.fit(X)
         self.clusters = self.ClusterAlg.cluster_centers_
