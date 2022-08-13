@@ -9,7 +9,8 @@ from devcode.utils.simulation import evalGOLS
 from devcode.utils import initialize_file
 
 if __name__ == '__main__':
-    from load_dataset import datasets
+    from load_dataset import get_datasets
+    datasets = get_datasets()
 
     test_size     = 0.2
     scale_type     = 'min-max'

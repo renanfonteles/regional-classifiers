@@ -3,6 +3,9 @@ import plotly.graph_objects as go
 import plotly.offline as py
 
 
+default_marker_colors = ["rgba(44, 160, 101, 0.5)", "rgba(93, 164, 214, 0.5)", "rgba(155, 89, 182,1.0)"]
+
+
 def plot_data(X, is_notebook=True):
     fig = go.Figure(data=go.Scatter(x=X[:, 0], y=X[:, 1], mode='markers'))
     fig.update_layout({
@@ -303,6 +306,16 @@ def render_boxplot_train_test(tr_data, ts_data, title, metric_name="Accuracy"):
     fig.show()
 
 
+def create_multiple_boxplots(datas, x_labels, marker_colors=None):
+    if marker_colors is None:
+        marker_colors = default_marker_colors
+
+    boxplots = [go.Box(y=data, name=x_label, boxmean="sd", marker_color=marker_color)
+                for data, x_label, marker_color in zip(datas, x_labels, marker_colors)]
+
+    return boxplots
+
+
 def render_boxplot_with_histogram_train_test(tr_data, ts_data, title, metric_name="Accuracy", bin_size=10):
     import plotly.figure_factory as ff
 
@@ -378,4 +391,38 @@ def plot_datapoints(X, title):
     fig.show("notebook")
 
 
+def set_figure(data, title=None, yaxis=None, showlegend=True):
+    layout = go.Layout(title=title, yaxis=yaxis, showlegend=showlegend, legend=dict(x=.875, y=1))
 
+    fig = go.Figure(data=data, layout=layout)
+
+    fig.update_layout(margin=dict(l=20, r=5, t=5, b=20),)
+
+    return fig
+
+
+def add_line(fig, x, y, line_width=2):
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers',
+                             line=dict(color="RoyalBlue", dash="dashdot", width=line_width),
+                             showlegend=False))
+
+    return fig
+
+
+def create_multiple_barcharts(x_datas, y_datas, names):
+    barcharts = [go.Bar(name=name, x=x, y=y) for name, x, y in zip(names, x_datas, y_datas)]
+
+    return barcharts
+
+
+def set_custom_bar_layout(fig):
+    fig.update_layout(barmode='group')
+    fig.update_layout(
+        #         title = "Distribuição do k_opt para as {} rodadas no conjunto <b>{}</b> e modelagem <b>{}</b>".format(
+        #             len(df_dataset), dataset_name, model_type),
+        xaxis_title='Número de agrupamentos',
+        yaxis_title='Frequência',
+        bargap=0.4,  # gap between bars of adjacent location coordinates
+    )
+
+    return fig

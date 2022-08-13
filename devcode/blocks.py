@@ -1,7 +1,7 @@
 import pandas as pd
 
 from devcode.analysis.results import results_per_dataset
-from devcode.settings import get_default_lssvm_gs_hyperparams, get_som_params
+from devcode.simulation.settings import get_default_lssvm_gs_hyperparams, get_som_params
 from devcode.utils import load_csv_as_pandas
 
 

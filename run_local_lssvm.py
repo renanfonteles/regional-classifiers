@@ -1,15 +1,17 @@
 import numpy as np
 
-from devcode.settings import get_default_lssvm_gs_hyperparams
+from devcode.simulation.settings import get_default_lssvm_gs_hyperparams
 from devcode.utils import initialize_file
 from devcode.utils.simulation import eval_LLSSVM
+
+from devcode.analysis.clustering import cluster_val_metrics
 
 from multiprocessing import Pool
 from functools import partial
 
 if __name__ == '__main__':
-    from devcode.analysis.clustering import cluster_val_metrics
-    from load_dataset import datasets
+    from load_dataset import get_datasets
+    datasets = get_datasets()
 
     test_size     = 0.2
     scale_type    = 'min-max'
@@ -25,11 +27,7 @@ if __name__ == '__main__':
 
     random_states = np.random.randint(np.iinfo(np.int32).max, size=n_resamplings).tolist()
 
-    cases = [{"dataset_name": dataset_name, "random_state": random_state,
-              "som_params": {"alpha0": alpha0, "sigma0": sigma0, "nEpochs": nEpochs}}
-             for dataset_name in datasets.keys() for random_state in random_states
-             for alpha0 in alphas for sigma0 in sigmas for nEpochs in epochs
-    ]
+
 
     temp = [' '] * 2 * len(cluster_val_metrics)
     count = 0

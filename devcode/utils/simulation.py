@@ -33,7 +33,7 @@ def _fit_and_evaluate_regional_model(case, X_tr_norm, y_train, X_ts_norm, y_test
     C = l ** 2  # number of SOM neurons in the 2D grid
     k_values = [i for i in range(2, ceil(np.sqrt(C)))]  # 2 to sqrt(C)
     cluster_params = {
-        'n_clusters': {'metric': DB,  # when a dictionary is pass a search begins
+        'n_clusters': {'metric'  : DB,  # when a dictionary is pass a search begins
                        'criteria': np.argmin,  # search for smallest DB score
                        'k_values': k_values},  # around the values provided in 'k_values'
         'n_init': 10,  # number of initializations

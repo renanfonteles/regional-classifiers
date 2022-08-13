@@ -4,11 +4,12 @@ import tqdm
 from multiprocessing import Pool
 from functools import partial
 
+from devcode.utils.simulation import evalRLM
 from devcode.utils import initialize_file
 
 if __name__ == '__main__':
-    from devcode.utils.simulation import evalRLM
-    from load_dataset import datasets
+    from load_dataset import get_datasets
+    datasets = get_datasets()
 
     test_size     = 0.2
     scale_type    = 'min-max'
