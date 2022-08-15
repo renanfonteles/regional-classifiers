@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from IPython.core.display import display
 from ipywidgets import HTML
@@ -6,6 +7,7 @@ from ipywidgets import HTML
 from devcode import cm2acc
 from devcode.analysis.clustering import _k_optimal_histogram, _hitrate_histogram_per_metric, k_optimal_hitrate_heatmap, \
     k_opt_hitrates_per_dataset, get_cluster_acronyms
+from devcode.analysis.results import extract_case, define_result_row
 from devcode.utils.evaluation import per_round_metrics
 from devcode.utils.visualization import create_multiple_boxplots, set_figure, add_line, create_multiple_barcharts, \
     set_custom_bar_layout
@@ -154,6 +156,68 @@ class ResultProcessor:
         k_optimal_hitrate_heatmap(hitrate_data=hitrates_per_dataset, metric_names=metric_acronyms, ds_names=ds_names,
                                   cmap="viridis", file_path='images/fig2_regional_heatmap.pdf')
 
+    @classmethod
+    def extract_table_evalution_metrics(cls, datasets, df_results, header, exp_params=None, params_keys=None,
+                                        only_accuracy=True):
+        n_cols   = len(header)
+
+        df_ds = {}
+
+        exp_params = exp_params if exp_params else [None]
+        n_params   = len(exp_params)
+
+        for dataset_name in datasets:
+            df = df_results.loc[df_results['dataset_name'] == dataset_name]  # get simulation results
+
+            if df.size == 0:
+                print(f"Experimentos não encontratos para base de dados {dataset_name}")
+                continue
+
+            count   = 0
+            df_data = np.empty((n_params, n_cols))  # matriz que guardará resultados numéricos
+
+            for params in exp_params:
+                df_case = extract_case(df, params, params_keys=params_keys) if (params and params_keys) else df
+
+                test_confusion_matrix = cls.extract_confusion_matrix_per_run(df_case, col="cm_ts")
+
+                accuracies, specifities, sensibilities, f1_scores = per_round_metrics(test_confusion_matrix,
+                                                                                      as_pct=True)
+
+                if only_accuracy:
+                    metrics         = [accuracies]
+                    stats_functions = [[np.mean, np.std]]
+                else:
+                    metrics         = [accuracies, specifities, sensibilities, f1_scores]
+                    stats_functions = [[np.mean, np.std], [np.mean], [np.mean], [np.mean]]
+
+                data_row = define_result_row(params, params_keys, metrics=metrics, stats_functions=stats_functions)
+
+                df_data[count, :] = data_row
+
+                count += 1
+
+            df_ds[dataset_name] = pd.DataFrame(df_data, columns=header)
+            # display(df_ds[dataset_name])
+            # print('-' * 100, '\n' * 2)
+
+        return df_ds
+
+    @classmethod
+    def merge_table_results(cls, dataframes_list, ds_names, header):
+        result_per_df = [cls.extract_table_evalution_metrics(ds_names, df, header=header, only_accuracy=False)
+                         for df in dataframes_list]
+
+        results_per_dataset = [[df_dict[ds_name] for df_dict in result_per_df] for ds_name in ds_names]
+
+        df_results_per_dataset = [pd.concat(ds_result, axis=0) for ds_result in results_per_dataset]
+
+        for df_dataset_result, ds_name in zip(df_results_per_dataset, ds_names):
+            print(ds_name)
+            df_dataset_result.set_axis(['Global', 'Local', 'Regional'], inplace=True)
+            df_dataset_result = df_dataset_result.round(2)
+            display(df_dataset_result)
+        # print("t")
 
 # from devcode.analysis.eigenvalues import eigenvalues_analysis_regional
 #
