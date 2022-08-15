@@ -1,16 +1,9 @@
-import plotly.offline as py
-import plotly.graph_objs as go
-
-from IPython.core.display import display, HTML
-
-from devcode.simulation import ResultProcessor
-from devcode.utils.visualization import create_multiple_boxplots, add_line, set_figure
-
 import pandas as pd
 import numpy as np
+import plotly.offline as py
 
+from devcode.simulation import ResultProcessor
 from devcode.utils import load_csv_as_pandas
-from devcode.utils.evaluation import cm2f1, cm2acc, cm2sen, cm2esp
 
 df_results = {
     'global'    : load_csv_as_pandas(path="results/local-results/cbic/temp_glssvm_cbic"),
@@ -18,7 +11,7 @@ df_results = {
     'regional'  : load_csv_as_pandas(path="results/regional-results/temp_rlssvm_somfix/results")
 }
 
-datasets = np.unique(df_results['global']['dataset_name'].values).tolist()
+ds_names     = ['pk', 'vc2c', 'vc3c', 'wf2f', 'wf4f', 'wf24f']
 
 py.init_notebook_mode(connected=True)  # enabling plot within jupyter notebook
 
@@ -30,6 +23,10 @@ model_labels = df_results.keys()
 def process_result_func(dataframes_dict, ds_name):
     ResultProcessor.compare_boxplot_per_set(dataframes_dict, ds_name)
     ResultProcessor.compare_local_regional_k_optimal(dataframes_dict, ds_name)
+    ResultProcessor.local_cluster_analysis(dataframes_dict, ds_name)
 
 
-ResultProcessor.process_results_in_multiple_datasets(datasets, df_results, process_result_func)
+# ResultProcessor.process_results_in_multiple_datasets(ds_names, df_results, process_result_func)
+
+# ResultProcessor.overall_regional_heatmap_cluster_analysis(df_results, ds_names)
+ResultProcessor.overall_local_heatmap_cluster_analysis(df_results, ds_names)

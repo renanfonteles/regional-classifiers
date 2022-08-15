@@ -1,8 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
 
-from load_dataset import datasets
-
 from sklearn.cluster import KMeans
 from sklearn import metrics
 
@@ -11,6 +9,27 @@ from devcode.utils import process_labels, collect_data
 from devcode.models.local_learning import BiasModel
 
 from IPython.core.display import display, HTML
+
+
+metrics_acronyms = {
+    "Silhouette"                    : "SI",
+    "Calinski-Harabasz"             : "CH",
+    "Davies-Bouldin"                : "DB",
+    "Dunn"                          : "DU",
+    "Final Prediction Error"        : "FPE",
+    "Akaike Information Criteria"   : "AIC",
+    "Bayesian Information Criteria" : "BIC",
+    "Minimum Description Length"    : "MDL",
+
+    "Adjusted Rand Index"           : "ARI",
+    "Adjusted Mutual Information"   : "AMI",
+    "V-measure"                     : "VM",
+    "Fowlkes-Mallows"               : "FM",
+}
+
+
+def get_cluster_acronyms(metric_names):
+    return [metrics_acronyms[name] for name in metric_names]
 
 
 # https://scikit-learn.org/stable/modules/clustering.html
@@ -125,7 +144,7 @@ def eval_cluster(cluster_metrics, X, labels_true, labels_pred):
     return results
 
 
-def evaluate_clusters(test_size, scaleType):
+def evaluate_clusters(datasets, test_size, scaleType):
     for dataset_name in datasets:
         X_tr_norm, y_train, X_ts_norm, y_test = collect_data(datasets, dataset_name, random_state=0,
                                                              test_size=test_size, scale_type=scaleType)
@@ -174,7 +193,7 @@ def evaluate_clusters(test_size, scaleType):
         print("Unique sugestions of k_opt = {}".format(np.unique(suggestions_for_k).tolist()))
 
 
-def find_optimal_k_per_dataset(test_size, scaleType):
+def find_optimal_k_per_dataset(datasets, test_size, scaleType):
     for ds_name in datasets:
         X_tr_norm, y_train, X_ts_norm, y_test = collect_data(datasets, ds_name, random_state=0,
                                                              test_size=test_size, scale_type=scaleType)
@@ -185,6 +204,38 @@ def find_optimal_k_per_dataset(test_size, scaleType):
         ks = np.arange(2, int(N ** (1 / 2)) + 1).tolist()
         print(get_k_opt_suggestions(X_tr_norm, y_temp, ks, cluster_val_metrics))
         print('\n')
+
+
+def extract_hitrate_per_clustering_metric(df, ds_name):
+    n_metrics = int((len(df.columns[6:-4]) - 1) / 4)
+
+    metric_names = [' '] * n_metrics
+
+    count = 0
+    for text in list(df.columns[-4 - n_metrics:-4]):
+        metric_names[count] = text[10:-1]
+        count += 1
+
+    # get dataframe of the specific dataset and k_opt
+    temp = 6 + 2 * n_metrics
+    df_dataset = df.loc[df['dataset_name'] == ds_name].iloc[:, temp:(temp + n_metrics + 1)]
+
+    hitrates_per_metric = [0] * len(metric_names)
+    for i in range(len(df_dataset)):
+        for j in range(len(metric_names)):
+            column_name = "$k_{opt}$" + " [{}]".format(metric_names[j])
+            if df_dataset[column_name].values[i] == df_dataset["$k_{opt}$ [CV]"].values[i]:
+                hitrates_per_metric[j] += 1
+
+    return hitrates_per_metric, metric_names
+
+
+def k_opt_hitrates_per_dataset(df, datasets):
+    hitrates_values = [extract_hitrate_per_clustering_metric(df, ds_name) for ds_name in datasets]
+    metric_names = hitrates_values[0][1]
+    hitrates_per_dataset = [hit_value for hit_value, _ in hitrates_values]
+
+    return hitrates_per_dataset, metric_names
 
 
 def _hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=False, save_flag=False):
@@ -303,76 +354,6 @@ def k_optimal_hitrate_heatmap(hitrate_data, metric_names, ds_names, cmap, file_p
 
     if save_flag:
         plt.savefig(file_path)
-
-
-def cluster_metrics_analysis(df, result_key):
-    """
-
-    Parameters
-    ----------
-    df           [dict]: dict containing multiple results
-    result_key [String]: key from df dict
-
-    Returns
-    -------
-
-    """
-    for dataset_name in datasets:
-        display(HTML('<center><h1>' + dataset_name + '</h1></center>'))
-
-        _k_optimal_histogram(df, dataset_name, result_key, show_flag=False, save_flag=False)
-        _hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=True, save_flag=True)
-
-        display(HTML('<hr>'))
-
-
-def k_optimal_histogram_local_vs_regional(df):
-    for dataset_name in datasets:
-        display(HTML('<center><h1>' + dataset_name + '</h1></center>'))
-
-        # get dataframe of the specific dataset
-        df_local    = df['local'].loc[df['local']['dataset_name'] == dataset_name]
-        df_regional = df['regional'].loc[df['regional']['dataset_name'] == dataset_name]
-
-        fig = go.Figure(data=[
-            go.Bar(
-                name='L-LSSVM',
-                x=df_local["$k_{opt}$ [CV]"].value_counts().index.tolist(),
-                y=df_local["$k_{opt}$ [CV]"].value_counts().values
-            ),
-            go.Bar(
-                name='R-LSSVM',
-                x=df_regional["$k_{opt}$ [CV]"].value_counts().index.tolist(),
-                y=df_regional["$k_{opt}$ [CV]"].value_counts().values
-            )
-        ])
-        # Change the bar mode
-        fig.update_layout(barmode='group')
-        fig.update_layout(
-            #         title = "Distribuição do k_opt para as {} rodadas no conjunto <b>{}</b> e modelagem <b>{}</b>".format(
-            #             len(df_dataset), dataset_name, model_type),
-            xaxis_title='Número de agrupamentos',
-            yaxis_title='Frequência',
-            bargap=0.4,  # gap between bars of adjacent location coordinates
-        )
-        fig.update_layout(legend=dict(x=.86, y=1))
-
-        #         # boxplot to k_{opt}
-        #         fig = go.Figure(data=[go.Histogram(
-        #             x=df_dataset["$k_{opt}$ [CV]"].values.tolist(),
-        #             xbins_size=1,
-        #             marker_color='rgb(55, 83, 109)'
-        #         )])
-
-        fig.update_layout(
-            margin=dict(l=20, r=5, t=5, b=20),
-            #         paper_bgcolor="LightSteelBlue"
-        )
-
-        fig.show()
-        fig.write_image("images/r_l-lssvm_k_opt_dist_{}.pdf".format(dataset_name))
-
-        display(HTML('<hr>'))
 
 
 def find_optimal_clusters(lm, suggestions, validation_scores, best_hps_list):

@@ -4,6 +4,8 @@ from IPython.core.display import display
 from ipywidgets import HTML
 
 from devcode import cm2acc
+from devcode.analysis.clustering import _k_optimal_histogram, _hitrate_histogram_per_metric, k_optimal_hitrate_heatmap, \
+    k_opt_hitrates_per_dataset, get_cluster_acronyms
 from devcode.utils.evaluation import per_round_metrics
 from devcode.utils.visualization import create_multiple_boxplots, set_figure, add_line, create_multiple_barcharts, \
     set_custom_bar_layout
@@ -44,6 +46,18 @@ class ResultProcessor:
 
     @classmethod
     def extract_metric_per_set(cls, dataframe_dicts, ds_name, model_labels):
+        """
+            Dataset-wise extraction of train and test set results (i.e., accuracy)
+
+            Parameters
+            ----------
+            dataframe_dicts
+            ds_name
+            model_labels
+
+            Returns
+            -------
+        """
         acc_per_set = {}
 
         for classifier in model_labels:
@@ -109,3 +123,39 @@ class ResultProcessor:
 
         fig.show()
         fig.write_image("images/r_l-lssvm_k_opt_dist_{ds_name}.pdf")
+
+    @classmethod
+    def local_cluster_analysis(cls, dataframes_dict, ds_name):
+        _k_optimal_histogram(dataframes_dict, ds_name, result_key="local", show_flag=False, save_flag=False)
+        _hitrate_histogram_per_metric(dataframes_dict, ds_name, result_key="local", show_flag=True, save_flag=True)
+
+    @classmethod
+    def regional_cluster_analysis(cls, dataframes_dict, ds_name):
+        _k_optimal_histogram(dataframes_dict, ds_name, result_key="regional", show_flag=False, save_flag=False)
+        _hitrate_histogram_per_metric(dataframes_dict, ds_name, result_key="regional", show_flag=True, save_flag=True)
+
+    @classmethod
+    def overall_local_heatmap_cluster_analysis(cls, dataframes_dict, ds_names):
+        df_local    = dataframes_dict["local"]
+
+        hitrates_per_dataset, metric_names = k_opt_hitrates_per_dataset(df_local, ds_names)
+        metric_acronyms = get_cluster_acronyms(metric_names)
+
+        k_optimal_hitrate_heatmap(hitrate_data=hitrates_per_dataset, metric_names=metric_acronyms, ds_names=ds_names,
+                                  cmap="coolwarm", file_path='images/fig1_local_heatmap.pdf')
+
+    @classmethod
+    def overall_regional_heatmap_cluster_analysis(cls, dataframes_dict, ds_names):
+        df_regional = dataframes_dict["regional"]
+
+        hitrates_per_dataset, metric_names = k_opt_hitrates_per_dataset(df_regional, ds_names)
+        metric_acronyms = get_cluster_acronyms(metric_names)
+
+        k_optimal_hitrate_heatmap(hitrate_data=hitrates_per_dataset, metric_names=metric_acronyms, ds_names=ds_names,
+                                  cmap="viridis", file_path='images/fig2_regional_heatmap.pdf')
+
+
+# from devcode.analysis.eigenvalues import eigenvalues_analysis_regional
+#
+# df_results = pd.read_csv("results/regional-results/ROLS - all - n_res=100 - 2019-07-10.csv")
+# eigenvalues_analysis_regional(datasets, df["regional"])
