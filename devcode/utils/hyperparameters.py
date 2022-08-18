@@ -185,7 +185,7 @@ class HyperOptimization:
                                                  cluster_params=cluster_params, som_params=som_params)
 
             # The best hyperparameters are the ones that maximize the objective function
-            best_hps_list[count_v] = hps_cases[np.argmax(cv_scores)]
+            best_hps_list[count_v]        = hps_cases[np.argmax(cv_scores)]
             validation_scores[count_v, :] = [k, np.amax(cv_scores)]
             count_v += 1
 

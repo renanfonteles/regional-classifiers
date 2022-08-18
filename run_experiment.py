@@ -15,6 +15,9 @@ def get_random_states(file_names):
 
 
 if __name__ == '__main__':
+    import warnings
+    warnings.filterwarnings('ignore')
+
     from load_dataset import get_datasets
     datasets      = get_datasets()
     dataset_names = ["pk", "vc2c", "vc3c", "wf2f", "wf4f", "wf24f"]
@@ -22,10 +25,9 @@ if __name__ == '__main__':
     rng = np.random.default_rng(seed=42)
     random_states = get_random_states(FileUtils.get_file_names_in_dir(dir_path=glssvm_result_path))
 
-    ExperimentHandler.run_experiment(datasets, dataset_names, n_samples=50, test_size=0.5,
-                                     random_states=random_states, multiprocessing=False)
+    ExperimentHandler.run_experiment_part1(datasets, dataset_names, n_samples=50, test_size=0.5,
+                                           random_states=random_states, multiprocessing=False)
 
-    # ExperimentHandler.run_experiment(datasets, dataset_names, n_samples=50, test_size=0.5, random_generator=rng,
-    #                                  multiprocessing=False)
-
+    # ExperimentHandler.run_experiment_part2(datasets, dataset_names, n_samples=50, test_size=0.5,
+    #                                        random_states=random_states, multiprocessing=False)
 
