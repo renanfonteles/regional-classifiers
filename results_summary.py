@@ -14,3 +14,4 @@ ResultHandler.local_lssvm_summary(datasets)       # Local Least Square Support V
 
 ResultHandler.regional_ols_summary(datasets)      # Regional Ordinary Least Square (R-OLS)
 ResultHandler.regional_lssvm_summary(datasets)    # Regional Least Square Support Vector Machine (R-LSSVM)
+

@@ -77,7 +77,15 @@ class ResultProcessor:
         return acc_per_set
 
     @classmethod
-    def compare_boxplot_per_set(cls, dataframes_dict, ds_name):
+    def _connect_boxplot_means(cls, fig, data, x_labels, df_keys, set_key):
+        y = [np.mean(data[key][set_key]) for key in df_keys]
+
+        fig = add_line(fig, x_labels + [x_labels[0]], y)
+
+        return fig
+
+    @classmethod
+    def _compare_boxplot_per_set(cls, dataframes_dict, ds_name, model_name, df_keys):
         set_dict     = {'treino': 'cm_tr', 'teste': 'cm_ts'}
         model_labels = dataframes_dict.keys()
 
@@ -85,8 +93,8 @@ class ResultProcessor:
 
         accuracies_per_set = [[data[classifier][set_] for classifier in model_labels] for set_ in set_dict]
 
-        x_labels_tr = [f"Train {key.upper()}-LSSVM" for key in dataframes_dict.keys()]
-        x_labels_ts = [f"Test {key.upper()}-LSSVM" for key in dataframes_dict.keys()]
+        x_labels_tr = [f"Train {key.upper()}-{model_name}" for key in dataframes_dict.keys()]
+        x_labels_ts = [f"Test {key.upper()}-{model_name}" for key in dataframes_dict.keys()]
 
         tr_boxplots_per_set = create_multiple_boxplots(datas=accuracies_per_set[0], x_labels=x_labels_tr)
         ts_boxplots_per_set = create_multiple_boxplots(datas=accuracies_per_set[1], x_labels=x_labels_ts)
@@ -94,18 +102,51 @@ class ResultProcessor:
         fig = set_figure(data=(tr_boxplots_per_set + ts_boxplots_per_set), yaxis={"title": "Accuracy (%)"},
                          showlegend=False)
 
-        y = [np.mean(data['global']['treino']), np.mean(data['local']['treino']),
-             np.mean(data['regional']['treino']), np.mean(data['global']['treino'])]
+        fig = cls._connect_boxplot_means(fig, data, x_labels_tr, df_keys, set_key="treino")
+        fig = cls._connect_boxplot_means(fig, data, x_labels_ts, df_keys, set_key="teste")
 
-        fig = add_line(fig, x_labels_tr + [x_labels_tr[0]], y)
+        return fig
 
-        y = [np.mean(data['global']['teste']), np.mean(data['local']['teste']),
-             np.mean(data['regional']['teste']), np.mean(data['global']['teste'])]
-
-        fig = add_line(fig, x_labels_ts + [x_labels_ts[0]], y)
+    @classmethod
+    def compare_global_regional_lsc_boxplots(cls, dataframes_dict, ds_name):
+        df_keys = ["global", "regional"]
+        fig = cls._compare_boxplot_per_set(dataframes_dict, ds_name, model_name="LSC", df_keys=df_keys)
 
         fig.show()
-        fig.write_image("images/ar-lssvm_{}.pdf".format(ds_name))
+        fig.write_image("images/global-vs-local-lsc-{}.pdf".format(ds_name))
+
+    @classmethod
+    def compare_boxplot_per_set(cls, dataframes_dict, ds_name):
+        df_keys = ["global", "local", "regional", "global"]
+        fig = cls._compare_boxplot_per_set(dataframes_dict, ds_name, model_name="LSSVM", df_keys=df_keys)
+        # set_dict     = {'treino': 'cm_tr', 'teste': 'cm_ts'}
+        # model_labels = dataframes_dict.keys()
+        #
+        # data = cls.extract_metric_per_set(dataframes_dict, ds_name, model_labels)
+        #
+        # accuracies_per_set = [[data[classifier][set_] for classifier in model_labels] for set_ in set_dict]
+        #
+        # x_labels_tr = [f"Train {key.upper()}-LSSVM" for key in dataframes_dict.keys()]
+        # x_labels_ts = [f"Test {key.upper()}-LSSVM" for key in dataframes_dict.keys()]
+        #
+        # tr_boxplots_per_set = create_multiple_boxplots(datas=accuracies_per_set[0], x_labels=x_labels_tr)
+        # ts_boxplots_per_set = create_multiple_boxplots(datas=accuracies_per_set[1], x_labels=x_labels_ts)
+        #
+        # fig = set_figure(data=(tr_boxplots_per_set + ts_boxplots_per_set), yaxis={"title": "Accuracy (%)"},
+        #                  showlegend=False)
+        #
+        # y = [np.mean(data['global']['treino']), np.mean(data['local']['treino']),
+        #      np.mean(data['regional']['treino']), np.mean(data['global']['treino'])]
+        #
+        # fig = add_line(fig, x_labels_tr + [x_labels_tr[0]], y)
+        #
+        # y = [np.mean(data['global']['teste']), np.mean(data['local']['teste']),
+        #      np.mean(data['regional']['teste']), np.mean(data['global']['teste'])]
+        #
+        # fig = add_line(fig, x_labels_ts + [x_labels_ts[0]], y)
+
+        fig.show()
+        fig.write_image("images/r-lssvm_{}.pdf".format(ds_name))
 
     @classmethod
     def compare_local_regional_k_optimal(cls, dataframes_dict, ds_name):
@@ -135,6 +176,10 @@ class ResultProcessor:
     def regional_cluster_analysis(cls, dataframes_dict, ds_name):
         _k_optimal_histogram(dataframes_dict, ds_name, result_key="regional", show_flag=False, save_flag=False)
         _hitrate_histogram_per_metric(dataframes_dict, ds_name, result_key="regional", show_flag=True, save_flag=True)
+
+    @classmethod
+    def regional_k_optimal_histogram(cls, dataframes_dict, ds_name):
+        _k_optimal_histogram(dataframes_dict, ds_name, result_key="regional", show_flag=True, save_flag=False)
 
     @classmethod
     def overall_local_heatmap_cluster_analysis(cls, dataframes_dict, ds_names):
@@ -204,7 +249,7 @@ class ResultProcessor:
         return df_ds
 
     @classmethod
-    def merge_table_results(cls, dataframes_list, ds_names, header):
+    def merge_table_results(cls, dataframes_list, ds_names, header, model_names):
         result_per_df = [cls.extract_table_evalution_metrics(ds_names, df, header=header, only_accuracy=False)
                          for df in dataframes_list]
 
@@ -214,7 +259,7 @@ class ResultProcessor:
 
         for df_dataset_result, ds_name in zip(df_results_per_dataset, ds_names):
             print(ds_name)
-            df_dataset_result.set_axis(['Global', 'Local', 'Regional'], inplace=True)
+            df_dataset_result.set_axis(model_names, inplace=True)
             df_dataset_result = df_dataset_result.round(2)
             display(df_dataset_result)
         # print("t")

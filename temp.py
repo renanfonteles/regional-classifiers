@@ -21,17 +21,5 @@ set_dict = {'treino': 'cm_tr', 'teste': 'cm_ts'}
 model_labels = _dataframes_dict.keys()
 
 
-def process_result_func(dataframes_dict, ds_name):
-    ResultProcessor.compare_boxplot_per_set(dataframes_dict, ds_name)
-    ResultProcessor.compare_local_regional_k_optimal(dataframes_dict, ds_name)
-    ResultProcessor.local_cluster_analysis(dataframes_dict, ds_name)
-
-
-# ResultProcessor.process_results_in_multiple_datasets(ds_names, df_results, process_result_func)
-
-# ResultProcessor.overall_regional_heatmap_cluster_analysis(df_results, ds_names)
-# ResultProcessor.overall_local_heatmap_cluster_analysis(dataframes_dict, ds_names)
-
-all_metrics_header = ['Mean', 'Std. Deviation', 'Sens.', 'Spec.', 'f1 Score']
-
-ResultProcessor.merge_table_results(list(_dataframes_dict.values()), ds_names, header=all_metrics_header)
+ResultProcessor.process_results_in_multiple_datasets(ds_names, _dataframes_dict,
+                                                     ResultProcessor.regional_k_optimal_histogram)

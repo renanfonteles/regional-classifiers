@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 from sklearn import metrics
 
 from devcode.utils.metrics import dunn_fast, FPE, AIC, BIC, MDL, FPE
-from devcode.utils import process_labels, collect_data
+from devcode.utils import process_labels, collect_data, FileUtils
 from devcode.models.local_learning import BiasModel
 
 from IPython.core.display import display, HTML
@@ -108,6 +108,70 @@ cluster_val_metrics = [
     },
 ]
 
+regional_cluster_val_metrics = cluster_val_metrics[4:]
+local_cluster_val_metrics    = cluster_val_metrics
+
+
+class RegionalUtils:
+    @classmethod
+    def _default_file_name(cls, dataset_name, random_state, model_name):
+        return f"results/temp/optimal-regions/K-opt - {model_name} - {dataset_name} - Random state {random_state}.pickle"
+
+    @classmethod
+    def load_region_params(cls, dataset_name, random_state, model_name):
+        file_path   = cls._default_file_name(dataset_name, random_state, model_name)
+        loaded_data = FileUtils.load_pickle_file(file_path)
+
+        return loaded_data
+
+    @classmethod
+    def save_region_params(cls, region_params, dataset_name, random_state, model_name):
+        file_path = cls._default_file_name(dataset_name, random_state, model_name)
+        FileUtils.save_pickle_file(data=region_params, file_path=file_path)
+
+    @classmethod
+    def search_optimal_region_params(cls, model_name, dataset_name, random_state, Cluster_params, som_neurons):
+        loaded_region_params = cls.load_region_params(dataset_name, random_state, model_name=model_name)
+
+        if loaded_region_params:
+            return loaded_region_params
+        else:
+            region_params = cls.find_best_number_k_regions(Cluster_params, som_neurons)
+            cls.save_region_params(region_params, dataset_name, random_state, model_name=model_name)
+
+            return region_params
+
+    @classmethod
+    def find_best_number_k_regions(cls, Cluster_params, som_neurons):
+        """
+            Search optimal number of regions (k_opt)
+        """
+        if type(Cluster_params['n_clusters']) is dict:  # a search is implied:
+            eval_function = Cluster_params['n_clusters']['metric']
+            find_best = Cluster_params['n_clusters']['criteria']
+            k_values = Cluster_params['n_clusters']['k_values']
+
+            validation_index = [0] * len(k_values)
+            for i in range(len(k_values)):
+                kmeans = KMeans(n_clusters=k_values[i], n_init=10, init='random').fit(som_neurons)
+                # test if number of distinct clusters == number of clusters specified
+                centroids = kmeans.cluster_centers_
+                if len(centroids) == len(np.unique(centroids, axis=0)):
+                    validation_index[i] = eval_function(kmeans, som_neurons)
+                else:
+                    validation_index[i] = np.NaN
+
+            k_opt = k_values[find_best(validation_index)]
+
+            # print("Best k found: {}".format(k_opt))
+        else:
+            k_opt = Cluster_params['n_clusters']
+
+        params = Cluster_params.copy()
+        params.update({"n_clusters": k_opt})
+
+        return params
+
 
 def get_k_opt_suggestions(X, y, ks, cluster_metrics):
     """
@@ -144,10 +208,10 @@ def eval_cluster(cluster_metrics, X, labels_true, labels_pred):
     return results
 
 
-def evaluate_clusters(datasets, test_size, scaleType):
+def evaluate_clusters(datasets, test_size, scale_type, cluster_metrics):
     for dataset_name in datasets:
         X_tr_norm, y_train, X_ts_norm, y_test = collect_data(datasets, dataset_name, random_state=0,
-                                                             test_size=test_size, scale_type=scaleType)
+                                                             test_size=test_size, scale_type=scale_type)
 
         y_temp = process_labels(y_train)
 
@@ -156,7 +220,7 @@ def evaluate_clusters(datasets, test_size, scaleType):
 
         n_ks = len(ks)
 
-        results = {metric['name']: [None] * n_ks for metric in cluster_val_metrics}
+        results = {metric['name']: [None] * n_ks for metric in cluster_metrics}
         # print(results)
 
         from tqdm import tnrange, tqdm_notebook
@@ -165,7 +229,7 @@ def evaluate_clusters(datasets, test_size, scaleType):
             labels_true = y_temp.ravel()
             labels_pred = kmeans.labels_
 
-            temp = eval_cluster(cluster_val_metrics, X_tr_norm, labels_true, labels_pred)
+            temp = eval_cluster(cluster_metrics, X_tr_norm, labels_true, labels_pred)
 
             for name in temp:
                 results[name][i] = temp[name]
@@ -181,10 +245,12 @@ def evaluate_clusters(datasets, test_size, scaleType):
                           )
         fig.show()
 
-        suggestions_for_k = np.empty(len(cluster_val_metrics), dtype='int16')
+        n_metrics = len(cluster_metrics)
 
-        for i in range(len(cluster_val_metrics)):
-            metric = cluster_val_metrics[i]
+        suggestions_for_k = np.empty(n_metrics, dtype='int16')
+
+        for i in range(n_metrics):
+            metric = cluster_metrics[i]
             suggestions_for_k[i] = ks[metric['get_best'](results[metric['name']])]
 
             print('Best k for {:30}: {}'.format(metric['name'], suggestions_for_k[i]))
@@ -193,16 +259,16 @@ def evaluate_clusters(datasets, test_size, scaleType):
         print("Unique sugestions of k_opt = {}".format(np.unique(suggestions_for_k).tolist()))
 
 
-def find_optimal_k_per_dataset(datasets, test_size, scaleType):
+def find_optimal_k_per_dataset(datasets, test_size, scale_type, cluster_metrics):
     for ds_name in datasets:
         X_tr_norm, y_train, X_ts_norm, y_test = collect_data(datasets, ds_name, random_state=0,
-                                                             test_size=test_size, scale_type=scaleType)
+                                                             test_size=test_size, scale_type=scale_type)
 
         y_temp = process_labels(y_train)
 
         N = len(X_tr_norm)
         ks = np.arange(2, int(N ** (1 / 2)) + 1).tolist()
-        print(get_k_opt_suggestions(X_tr_norm, y_temp, ks, cluster_val_metrics))
+        print(get_k_opt_suggestions(X_tr_norm, y_temp, ks, cluster_metrics))
         print('\n')
 
 
@@ -356,41 +422,46 @@ def k_optimal_hitrate_heatmap(hitrate_data, metric_names, ds_names, cmap, file_p
         plt.savefig(file_path)
 
 
-def find_optimal_clusters(lm, suggestions, validation_scores, best_hps_list):
-    k_opt           = len(lm.models)
-    n_empty_regions = len(lm.empty_regions)
+def find_optimal_clusters(local_models, n_empty_regions, suggestions, validation_scores, best_hps_list,
+                          cluster_metrics):
+    n_models        = len(local_models)
     n_homogeneous_regions = 0
 
-    for i in range(len(lm.models)):
-        if isinstance(lm.models[i], BiasModel):
+    for i in range(n_models):
+        if isinstance(local_models[i], BiasModel):
             n_homogeneous_regions += 1
 
     # Organizing suggestion of the cluster metrics
-    temp = [np.nan] * 2 * len(cluster_val_metrics)
+    temp = organize_cluster_metrics(best_hps_list, validation_scores, suggestions, cluster_metrics)
+
+    empty_and_homo = [n_empty_regions, n_homogeneous_regions]
+    valid_metrics  = [validation_scores[np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0], 1]
+                      for metric in cluster_metrics]
+
+    return empty_and_homo, valid_metrics
+
+
+def organize_cluster_metrics(best_hps_list, validation_scores, suggestions, cluster_metrics):
+    # Organizing suggestion of the cluster metrics
+    temp = [np.nan] * 2 * len(cluster_metrics)
     count = 0
-    for metric in cluster_val_metrics:
+    for metric in cluster_metrics:
         temp[count] = best_hps_list[
             np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['gamma']
         temp[count + 1] = best_hps_list[
             np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['sigma']
         count += 2
 
-    empty_and_homo = [n_empty_regions, n_homogeneous_regions]
-    valid_metrics  = [validation_scores[np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0], 1]
-                      for metric in cluster_val_metrics]
-
-    return empty_and_homo, valid_metrics
+    return temp
 
 
-def organize_cluster_metrics(best_hps_list, validation_scores, suggestions):
-    # Organizing suggestion of the cluster metrics
-    temp = [np.nan] * 2 * len(cluster_val_metrics)
+def get_header_optimal_k_lssvm_hps(cluster_metrics):
+    temp = [' '] * 2 * len(cluster_metrics)
     count = 0
-    for metric in cluster_val_metrics:
-        temp[count] = best_hps_list[
-            np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['gamma']
-        temp[count + 1] = best_hps_list[
-            np.where(validation_scores[:, 0] == suggestions[metric['name']])[0][0]]['sigma']
+
+    for metric in cluster_metrics:
+        temp[count]     = "$\gamma_{opt}$ " + "[{}]".format(metric['name'])
+        temp[count + 1] = "$\sigma_{opt}$ " + "[{}]".format(metric['name'])
         count += 2
 
     return temp
