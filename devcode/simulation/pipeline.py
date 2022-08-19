@@ -1,26 +1,11 @@
 from devcode.simulation.settings import ExperimentSettings
-from devcode.simulation.fit_evaluation import eval_GLSSVM, eval_LLSSVM, eval_RLSSVM, eval_ROLS
+from devcode.simulation.fit_evaluation import eval_GLSSVM, eval_LLSSVM, eval_RLSSVM, eval_ROLS, eval_GOLS
 
 from multiprocessing import Pool
 from functools import partial
 
 
 class ExperimentHandler:
-
-    @classmethod
-    def run_experiment_part1(cls, datasets, dataset_names, n_samples=50, scale_type='min-max', test_size=0.5,
-                             random_states=None, random_generator=None, multiprocessing=False):
-        """
-            Experiment Part 1: global vs regional comparing using linear model as base classifier
-        """
-
-        experiment_settings = [
-            (ExperimentSettings.regional_ols_settings, eval_ROLS),
-        ]
-
-        cls.run_experiment(experiment_settings, datasets, dataset_names, n_samples=n_samples, scale_type=scale_type,
-                           test_size=test_size, random_states=random_states, random_generator=random_generator,
-                           multiprocessing=multiprocessing)
 
     @classmethod
     def run_experiment_part2(cls, datasets, dataset_names, n_samples=50, scale_type='min-max', test_size=0.5,
@@ -31,8 +16,8 @@ class ExperimentHandler:
 
         experiment_settings = [
             (ExperimentSettings.global_lssvm_settings,      eval_GLSSVM),
-            (ExperimentSettings.local_regional_lssvm_cases, eval_LLSSVM),
-            (ExperimentSettings.regional_lssvm_cases,       eval_RLSSVM)
+            (ExperimentSettings.local_lssvm_settings,       eval_LLSSVM),
+            (ExperimentSettings.regional_lssvm_settings,    eval_RLSSVM)
 
         ]
 

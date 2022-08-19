@@ -4,12 +4,13 @@ import plotly.graph_objects as go
 from sklearn.cluster import KMeans
 from sklearn import metrics
 
+from devcode import K_OPT_PATH, CLUSTERING_SAVE_IMAGE_PATH
+
 from devcode.utils.metrics import dunn_fast, FPE, AIC, BIC, MDL, FPE
 from devcode.utils import process_labels, collect_data, FileUtils
 from devcode.models.local_learning import BiasModel
 
 from IPython.core.display import display, HTML
-
 
 metrics_acronyms = {
     "Silhouette"                    : "SI",
@@ -115,7 +116,7 @@ local_cluster_val_metrics    = cluster_val_metrics
 class RegionalUtils:
     @classmethod
     def _default_file_name(cls, dataset_name, random_state, model_name):
-        return f"results/temp/optimal-regions/K-opt - {model_name} - {dataset_name} - Random state {random_state}.pickle"
+        return f"{K_OPT_PATH}/K-opt - {model_name} - {dataset_name} - Random state {random_state}.pickle"
 
     @classmethod
     def load_region_params(cls, dataset_name, random_state, model_name):
@@ -331,14 +332,6 @@ def _hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=False,
         for i in range(len(x)):
             fig.add_trace(go.Bar(x=[x[i]], y=[y[i]], text=y[i], textposition='auto'))
 
-        #     fig = go.Figure([go.Bar(
-        #         x=x,
-        #         y=y,
-        #         text=y,
-        #         textposition='auto',
-        #         marker_color='lightsalmon'
-        #     )]
-        #     )
         fig.update_layout(
             #             title_text='Frequência de acerto da proposta ótima para cada métrica no '+ \
             #                         'conjunto <b>{}</b> e modelagem <b>{}</b>'.format(dataset_name, model_type),
@@ -354,7 +347,7 @@ def _hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=False,
             fig.show()
 
         if save_flag:
-            fig.write_image("images/r-lssvm_metrics-k_opt-hit-frequency_{}.pdf".format(dataset_name))
+            fig.write_image(f"{CLUSTERING_SAVE_IMAGE_PATH}/r-lssvm_metrics-k_opt-hit-frequency_{dataset_name}.pdf")
 
 
 def _k_optimal_histogram(df, dataset_name, result_key, show_flag=False, save_flag=False):
@@ -399,7 +392,7 @@ def _k_optimal_histogram(df, dataset_name, result_key, show_flag=False, save_fla
             fig.show()
 
         if save_flag:
-            fig.write_image("images/r-lssvm_k_opt_dist_{}.pdf".format(dataset_name))
+            fig.write_image(f"{CLUSTERING_SAVE_IMAGE_PATH}/r-lssvm_k_opt_dist_{dataset_name}.pdf")
 
 
 def k_optimal_hitrate_heatmap(hitrate_data, metric_names, ds_names, cmap, file_path, show_flag=True, save_flag=True):

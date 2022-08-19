@@ -4,7 +4,7 @@ import pandas as pd
 from IPython.core.display import display
 from ipywidgets import HTML
 
-from devcode import cm2acc
+from devcode import SAVE_IMAGE_PATH
 from devcode.analysis.clustering import _k_optimal_histogram, _hitrate_histogram_per_metric, k_optimal_hitrate_heatmap, \
     k_opt_hitrates_per_dataset, get_cluster_acronyms
 from devcode.analysis.results import extract_case, define_result_row
@@ -113,40 +113,15 @@ class ResultProcessor:
         fig = cls._compare_boxplot_per_set(dataframes_dict, ds_name, model_name="LSC", df_keys=df_keys)
 
         fig.show()
-        fig.write_image("images/global-vs-local-lsc-{}.pdf".format(ds_name))
+        fig.write_image(f"{SAVE_IMAGE_PATH}/global-vs-local-lsc-{ds_name}.pdf")
 
     @classmethod
     def compare_boxplot_per_set(cls, dataframes_dict, ds_name):
         df_keys = ["global", "local", "regional", "global"]
         fig = cls._compare_boxplot_per_set(dataframes_dict, ds_name, model_name="LSSVM", df_keys=df_keys)
-        # set_dict     = {'treino': 'cm_tr', 'teste': 'cm_ts'}
-        # model_labels = dataframes_dict.keys()
-        #
-        # data = cls.extract_metric_per_set(dataframes_dict, ds_name, model_labels)
-        #
-        # accuracies_per_set = [[data[classifier][set_] for classifier in model_labels] for set_ in set_dict]
-        #
-        # x_labels_tr = [f"Train {key.upper()}-LSSVM" for key in dataframes_dict.keys()]
-        # x_labels_ts = [f"Test {key.upper()}-LSSVM" for key in dataframes_dict.keys()]
-        #
-        # tr_boxplots_per_set = create_multiple_boxplots(datas=accuracies_per_set[0], x_labels=x_labels_tr)
-        # ts_boxplots_per_set = create_multiple_boxplots(datas=accuracies_per_set[1], x_labels=x_labels_ts)
-        #
-        # fig = set_figure(data=(tr_boxplots_per_set + ts_boxplots_per_set), yaxis={"title": "Accuracy (%)"},
-        #                  showlegend=False)
-        #
-        # y = [np.mean(data['global']['treino']), np.mean(data['local']['treino']),
-        #      np.mean(data['regional']['treino']), np.mean(data['global']['treino'])]
-        #
-        # fig = add_line(fig, x_labels_tr + [x_labels_tr[0]], y)
-        #
-        # y = [np.mean(data['global']['teste']), np.mean(data['local']['teste']),
-        #      np.mean(data['regional']['teste']), np.mean(data['global']['teste'])]
-        #
-        # fig = add_line(fig, x_labels_ts + [x_labels_ts[0]], y)
 
         fig.show()
-        fig.write_image("images/r-lssvm_{}.pdf".format(ds_name))
+        fig.write_image(f"{SAVE_IMAGE_PATH}/r-lssvm_{ds_name}.pdf")
 
     @classmethod
     def compare_local_regional_k_optimal(cls, dataframes_dict, ds_name):
@@ -165,7 +140,7 @@ class ResultProcessor:
         fig = set_custom_bar_layout(fig)
 
         fig.show()
-        fig.write_image("images/r_l-lssvm_k_opt_dist_{ds_name}.pdf")
+        fig.write_image(f"{SAVE_IMAGE_PATH}/r_l-lssvm_k_opt_dist_{ds_name}.pdf")
 
     @classmethod
     def local_cluster_analysis(cls, dataframes_dict, ds_name):
@@ -243,8 +218,6 @@ class ResultProcessor:
                 count += 1
 
             df_ds[dataset_name] = pd.DataFrame(df_data, columns=header)
-            # display(df_ds[dataset_name])
-            # print('-' * 100, '\n' * 2)
 
         return df_ds
 
@@ -262,9 +235,3 @@ class ResultProcessor:
             df_dataset_result.set_axis(model_names, inplace=True)
             df_dataset_result = df_dataset_result.round(2)
             display(df_dataset_result)
-        # print("t")
-
-# from devcode.analysis.eigenvalues import eigenvalues_analysis_regional
-#
-# df_results = pd.read_csv("results/regional-results/ROLS - all - n_res=100 - 2019-07-10.csv")
-# eigenvalues_analysis_regional(datasets, df["regional"])

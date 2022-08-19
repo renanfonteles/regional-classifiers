@@ -1,24 +1,35 @@
 # Pattern Classification Based on Regional Models
 
-Code, data and models for manuscript "Pattern Classification Based on Regional Models" 
+Code, data and models for manuscript "Pattern Classification Based on Regional Models" submitted to Applied Soft Computing.
 
-### TODO
- - [ ] Gerar tabelas referente ao Experimento III (Notebook Main3)
- - [ ] Corrigir Extra2-Preliminary results [G-LSSVM and L-LSSVM].ipynb
- - [ ] Corrigir Extra7-regional-classifier (Simple run).ipynb
- - [ ] Inserir código e resultados referente aos Experimentos I e II (Notebooks Main1 e Main2)
- - [ ] Definir quais notebooks "Extras" vão ser incluídos ao "Main"
- - [ ] Definir orientações para geração de resultados com diferentes configurações (datasets, modelos, etc)
- - [ ] Comentar código e notebooks
- 
- **Obs:** Notebooks iniciados como "Main" serão incluídos ao Code Ocean (CO). Notebooks iniciados com "Extra" precisam ser avaliados para ver se vai para o "Main" ou se servirão como apêndices.
+### Abstract
+In a supervised setting, the global classification paradigm leverages the whole training
+data to produce a single class discriminative model. Alternatively, the local
+classification approach builds multiple base classifiers, each of them using a small
+subset of the training data. In this paper, we take a path to stand in-between the global
+and local approaches. We introduce a two-level clustering-based method in which
+base classifiers operate on a larger portion of the input space than in the traditional
+local paradigm. In particular, we first obtain a grained input representation by
+employing a Self-Organizing Map (SOM) to the inputs. We then apply a clustering
+algorithm (e.g., K-Means) to the SOM units to define input regions a subset of input
+samples associated with a specific cluster of SOM units. We refer to this approach as
+regional classification. We demonstrate the effectiveness of regional classification on
+several benchmarks. Also, we study the impact of 1) adopting linear and nonlinear
+base classifiers (e.g., least-square support vector machines) and 2) using cluster
+validation indexes to determine the optimal number of clusters. Based on the
+experiments, the regional classification approach achieves competitive performance
+compared to its global and local counterparts, especially when equipped with linear
+base classifiers
 
 ### Dependencies
 
+- pickel
+- pandas
 - numpy
 - scikit
-- tensorflow
-- plotly (for visualization)
+- matplotlib
+- seaborn
+- plotly
 
 ### Datasets
 
@@ -28,18 +39,29 @@ Code, data and models for manuscript "Pattern Classification Based on Regional M
 
 <hr>
 
-### Paper results
+### Main paper results
 
-#### (Section 4.3) Part 1: global vs local-regional linear classification model
+##### (Section 4.3) Part 1: global vs local-regional linear classification model
+ - (Subsection 4.3.2) **Experiment II:** influence of the number of local regions in classification performance 
+   - *Results-Part1 (Experiment II).ipynb*
 
-| Subsection                                                               | Output                                            |
-|--------------------------------------------------------------------------|---------------------------------------------------|
-| (Subsection 4.3.1) **Experiment I:** global vs regional LSC-LBF <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)              | <ul><li>Table 3</li><li>Figures 5 and 6</li></ul> |
-| (Subsection 4.3.2) **Experiment II:** influence of the number of local regions <br /> in classification performance <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)  | <ul><li>Figure 7</li></ul> |
+##### (Section 4.4) Part 2: global vs local-regional non-linear classification model
+- (Subsection 4.4.4) **Experiment III:** global vs local vs regional LSSVM <br/> 
+  - *Results-Part2 (Experiment III).ipynb*
 
-#### (Section 4.4) Part 2: global vs local-regional non-linear classification model
 
-| Subsection                                                                                                               | Output                                   |
-|------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
-| (Subsection 4.4.4) **Experiment III:** global vs local vs regional LSSVM <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)                                                   | <ul><li>Tables 5, 6 and 7</li><li> Figures 8 and 9</li></ul> |
-| (Subsection 4.4.5) **Experiment IV:** optimal selection of number of local regions <br />based on ensemble of clustering indices <br/> [*Main-paper-results-note4.ipynb*](https://github.com/renanfonteles/regional-classifiers/blob/main/Main-paper-results-part1.ipynb)</span> | <ul><li>Figure 10</li></ul>                              |
+- (Subsection 4.4.5) **Experiment IV:** optimal selection of number of local regions based on ensemble of clustering indices
+  - *Results-Part2 (Experiment IV).ipynb*
+
+#### Additional notes
+
+<ul>
+    <li>The main results of our paper, presented in Part 2, can be reproduced in Code Ocean. </li>
+    <li>The hyperparameters regarding LSSVM, as well as the number of local/regional regions are pretrained and loaded previoustly to reduce computational cost.</li>
+    <li>The random states for Monte Carlo simulation are also predefined.</li>
+</ul>
+
+<!---
+| (Subsection 4.3.1) **Experiment I:** global vs regional LSC-LBF <br/>  *<ul><li>Results-Part2 (Experiment IV).ipynb</li></ul>*             | <ul><li>Table 3</li><li>Figures 5 and 6</li></ul> |
+
+-->

@@ -2,6 +2,7 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.offline as py
 
+from devcode import EXTRA_SAVE_IMAGE_PATH
 
 default_marker_colors = ["rgba(44, 160, 101, 0.5)", "rgba(93, 164, 214, 0.5)", "rgba(155, 89, 182,1.0)"]
 
@@ -155,7 +156,7 @@ def plot_voronoi_cells(X, kmeans):
 
     fig.show()
 
-    fig.write_image("chap2_kmeans_data_part.pdf", width=900, height=600)
+    fig.write_image(f"{EXTRA_SAVE_IMAGE_PATH}/chap2_kmeans_data_part.pdf", width=900, height=600)
 
     # creating meshgrid
     n = 200
@@ -268,7 +269,7 @@ def plot_voronoi_cells(X, kmeans):
 
     fig.show(renderer="png")
 
-    fig.write_image("chap2_kmeans_data_part_2.pdf", width=700, height=500)
+    fig.write_image(f"{EXTRA_SAVE_IMAGE_PATH}/chap2_kmeans_data_part_2.pdf", width=700, height=500)
 
 
 def render_boxplot(results, dataset_name, ks):

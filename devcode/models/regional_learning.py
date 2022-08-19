@@ -35,41 +35,6 @@ class RegionalModel:
         # Cluster training
         if cluster_params is not None:
             self.Cluster = KMeans(**cluster_params).fit(self.SOM.neurons)
-            # RegionalUtils.get_optimal_region_params()
-            # if verboses == 1:
-            #     print("Start of clustering SOM prototypes at {}".format(datetime.datetime.now()))
-            #
-            # # Search for k_opt
-            # k_opt = None
-            # if type(Cluster_params['n_clusters']) is dict:  # a search is implied:
-            #     eval_function = Cluster_params['n_clusters']['metric']
-            #     find_best = Cluster_params['n_clusters']['criteria']
-            #     k_values = Cluster_params['n_clusters']['k_values']
-            #
-            #     validation_index = [0] * len(k_values)
-            #     for i in range(len(k_values)):
-            #         kmeans = KMeans(n_clusters=k_values[i],
-            #                         n_init=10,
-            #                         init='random'
-            #                         # n_jobs=-1
-            #                         ).fit(self.SOM.neurons)
-            #         # test if number of distinct clusters == number of clusters specified
-            #         centroids = kmeans.cluster_centers_
-            #         if len(centroids) == len(np.unique(centroids, axis=0)):
-            #             validation_index[i] = eval_function(kmeans, self.SOM.neurons)
-            #         else:
-            #             validation_index[i] = np.NaN
-            #
-            #     k_opt = k_values[find_best(validation_index)]
-            #     if verboses == 1:
-            #         print("Best k found: {}".format(k_opt))
-            # else:
-            #     k_opt = Cluster_params['n_clusters']
-            #
-            # params = Cluster_params.copy()
-            # del params['n_clusters']  # deleting unecessary param
-            # # real training of clustering algorithm
-            # self.Cluster = KMeans(n_clusters=k_opt, **params).fit(self.SOM.neurons)
 
         k_opt = cluster_params["n_clusters"]
 

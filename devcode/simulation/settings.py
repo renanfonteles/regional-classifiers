@@ -1,5 +1,7 @@
 import numpy as np
 
+from devcode import GENERAL_RESULT_PATH, GLOBAL_MODEL_RESULT_PATH, REGIONAL_MODEL_RESULT_PATH, LOCAL_MODEL_RESULT_PATH
+
 from devcode.analysis.clustering import regional_cluster_val_metrics, cluster_val_metrics, \
     get_header_optimal_k_lssvm_hps
 from devcode.utils import initialize_file
@@ -108,13 +110,13 @@ class ExperimentSettings:
 
     @classmethod
     def _create_simulation_settings(cls, sim_name, datasets_names, random_states, cases=None,
-                                    additional_header=None, base_path="results/"):
+                                    additional_header=None, base_path=GENERAL_RESULT_PATH):
         n_samples = len(random_states)
 
         cases  = cases if cases else cls._default_cases(datasets_names, random_states)
         header = cls._define_header(additional_header)
 
-        filename = f"{base_path}{sim_name} - all - n_res={n_samples}.csv"
+        filename = f"{base_path}/{sim_name} - all - n_res={n_samples}.csv"
         simulation_file = initialize_file(filename, header)
 
         return simulation_file, header, cases
@@ -139,16 +141,22 @@ class ExperimentSettings:
         hps_cases = get_default_lssvm_gs_hyperparams()
         simulation_file, header, cases = cls._create_simulation_settings(
             sim_name="GLSSVM", datasets_names=datasets_names, random_states=random_states,
-            additional_header=["$\gamma$", "$\sigma$"])
+            additional_header=["$\gamma$", "$\sigma$"], base_path=GLOBAL_MODEL_RESULT_PATH)
 
         return simulation_file, header, cases, hps_cases
 
     @classmethod
-    def regional_lssvm_cases(cls, datasets_names, random_states):
-        return cls.local_regional_lssvm_cases(datasets_names, random_states, is_regional=True)
+    def regional_lssvm_settings(cls, datasets_names, random_states):
+        return cls.local_regional_lssvm_settings(datasets_names, random_states, base_path=REGIONAL_MODEL_RESULT_PATH,
+                                                 is_regional=True)
 
     @classmethod
-    def local_regional_lssvm_cases(cls, datasets_names, random_states, is_regional=False):
+    def local_lssvm_settings(cls, datasets_names, random_states):
+        return cls.local_regional_lssvm_settings(datasets_names, random_states, base_path=LOCAL_MODEL_RESULT_PATH,
+                                                 is_regional=False)
+
+    @classmethod
+    def local_regional_lssvm_settings(cls, datasets_names, random_states, base_path, is_regional):
         hps_cases = get_default_lssvm_gs_hyperparams()
 
         if is_regional:
@@ -171,6 +179,6 @@ class ExperimentSettings:
 
         simulation_file, header, cases = cls._create_simulation_settings(
             sim_name=sim_name, datasets_names=datasets_names, random_states=random_states, cases=cases,
-            additional_header=additional_header)
+            additional_header=additional_header, base_path=base_path)
 
         return simulation_file, header, cases, hps_cases

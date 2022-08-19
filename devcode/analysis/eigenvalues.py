@@ -122,28 +122,6 @@ def get_regional_eigenvalues(local_based_model, X_tr_norm):
     return get_local_regional_eigenvaleus(local_based_model.regional_models, X_local_labels, X_tr_norm)
 
 
-    # # getting eigenvalues of kernel matrices
-    # n_lssvms   = 0  # counter for LSSVM models
-    # models_idx = []
-    # for i in range(len(local_model.models)):
-    #     if isinstance(local_model.models[i], LSSVM):
-    #         n_lssvms += 1
-    #         models_idx.append(i)
-    #
-    # eigvals_list = [None, np.array([np.nan])] * n_lssvms
-    # count        = 0
-    # for i in models_idx:
-    #     x_region = X_tr_norm[local_model.ClusterAlg.labels_ == i]
-    #     K        = local_model.models[i].kernel(x_region, x_region)
-    #     temp     = np.linalg.eigvals(K)
-    #     eigvals_list[count] = temp  # .tostring()
-    #     count += 2
-    #
-    # eigvals = np.concatenate(eigvals_list, axis=0)
-    #
-    # return eigvals
-
-
 def eigenvalues_and_cond(eigen_string, dtypes):
     n_dtypes = len(dtypes)
     eigenvalues_list = [None] * n_dtypes
