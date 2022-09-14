@@ -73,7 +73,14 @@ by the following link: https://codeocean.com/capsule/9667739/tree.
 
 - (Subsection 4.4.5) **Experiment IV:** optimal selection of number of local regions based on ensemble of clustering indices
   - *Results-Part2 (Experiment IV).ipynb*
-  
+
+##### Extra contents
+- 2D and 3D visualization of regional modeling process <br/> 
+  - *Main-paper-extras-regional-visualization.ipynb*
+
+- Homogeneous and empty region analysis <br/> 
+  - *Main-paper-extras-homogeneous-analysis.ipynb*
+
 #### Additional notes
 
 <ul>
