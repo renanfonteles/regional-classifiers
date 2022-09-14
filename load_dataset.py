@@ -4,7 +4,7 @@ from devcode.utils import scale_feat
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 
-paper_result_path = "data/paper-results"
+paper_result_path = "results/paper-results"
 
 datasets = None
 
