@@ -1,4 +1,8 @@
+import os
 import datetime
+import pickle
+import traceback
+
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
@@ -136,3 +140,37 @@ def initialize_file(filename, header):
         writer.writerow(header)
 
     return simulation_file
+
+
+class FileUtils:
+    """
+        [Class that handles file manipulation]
+    """
+    @staticmethod
+    def create_folder_if_miss(file_path):
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    @staticmethod
+    def get_file_names_in_dir(dir_path):
+        return [path for path in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, path))]
+
+    @classmethod
+    def save_pickle_file(cls, data, file_path):
+        try:
+            file_to_store = open(file_path, "wb")
+            pickle.dump(data, file_to_store)
+            file_to_store.close()
+        except FileNotFoundError:
+            traceback.format_exc()
+            cls.create_folder_if_miss(file_path)
+            cls.save_pickle_file(data, file_path)
+
+    @staticmethod
+    def load_pickle_file(file_path):
+        try:
+            file_to_read = open(file_path, "rb")
+            loaded_data = pickle.load(file_to_read)
+            file_to_read.close()
+            return loaded_data
+        except FileNotFoundError:
+            traceback.format_exc()

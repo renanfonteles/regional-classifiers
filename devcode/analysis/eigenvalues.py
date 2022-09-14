@@ -84,27 +84,42 @@ def eigenvalue_analysis(df_results):
         print(eig)
 
 
-def get_local_eigenvalues(local_model, X_tr_norm):
+def get_local_regional_eigenvaleus(local_models, X_local_labels, X_tr_norm):
+    """
+        Getting eigenvalues of Kernel matrices
+    """
+    n_models = len(local_models)
     # getting eigenvalues of kernel matrices
-    n_lssvms   = 0  # counter for LSSVM models
+    n_lssvms = 0  # counter for LSSVM models
     models_idx = []
-    for i in range(len(local_model.models)):
-        if isinstance(local_model.models[i], LSSVM):
+    for i in range(n_models):
+        if isinstance(local_models[i], LSSVM):
             n_lssvms += 1
             models_idx.append(i)
 
     eigvals_list = [None, np.array([np.nan])] * n_lssvms
     count        = 0
+
     for i in models_idx:
-        x_region = X_tr_norm[local_model.ClusterAlg.labels_ == i]
-        K        = local_model.models[i].kernel(x_region, x_region)
+        x_region = X_tr_norm[X_local_labels == i]
+        K        = local_models[i].kernel(x_region, x_region)
         temp     = np.linalg.eigvals(K)
-        eigvals_list[count] = temp  # .tostring()
+
+        eigvals_list[count] = temp
         count += 2
 
     eigvals = np.concatenate(eigvals_list, axis=0)
 
     return eigvals
+
+
+def get_local_eigenvalues(local_based_model, X_tr_norm):
+    return get_local_regional_eigenvaleus(local_based_model.models, local_based_model.ClusterAlg.labels_, X_tr_norm)
+
+
+def get_regional_eigenvalues(local_based_model, X_tr_norm):
+    X_local_labels = local_based_model.regionalize(X_tr_norm)
+    return get_local_regional_eigenvaleus(local_based_model.regional_models, X_local_labels, X_tr_norm)
 
 
 def eigenvalues_and_cond(eigen_string, dtypes):

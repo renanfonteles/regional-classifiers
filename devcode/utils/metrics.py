@@ -1,13 +1,17 @@
-# TODO: __author__ = "Joaquim Viegas"
+"""
+Note: the following validation metrics was implemented by Joaquim Viegas, and these functions wer e cloned from the
+following GitHub link: https://github.com/jqmviegas/jqm_cvi
 
-""" JQM_CV - Python implementations of Dunn and Davis Bouldin clustering validity indices
+JQM_CV - Python implementations of Dunn and Davis Bouldin clustering validity indices
 
 dunn(k_list):
     Slow implementation of Dunn index that depends on numpy
+
     -- basec.pyx Cython implementation is much faster but flower than dunn_fast()
 dunn_fast(points, labels):
     Fast implementation of Dunn index that depends on numpy and sklearn.pairwise
     -- No Cython implementation
+
 davisbouldin(k_list, k_centers):
     Implementation of Davis Boulding index that depends on numpy
     -- basec.pyx Cython implementation is much faster
@@ -146,8 +150,10 @@ def davisbouldin(k_list, k_centers):
     res = db/len_k_list
     return res
 
+# -------------------------------------------------------------------------------------------------------------------- #
+# ------------------------------------- Implemented by paper's authors ----------------------------------------------- #
+# -------------------------------------------------------------------------------------------------------------------- #
 
-# --------------------------------------- Implemented by Rômulo ------------------------------------------------------ #
 from numpy.linalg import norm
 
 

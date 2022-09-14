@@ -1,34 +1,40 @@
 import numpy as np
 
 
-def per_round_metrics(confusion_matrix):
+def per_round_metrics(confusion_matrix, as_pct=False, as_list=True):
     """
 
     Parameters
     ----------
+    as_pct
+    as_list
     confusion_matrix
 
     Returns
     -------
 
     """
-    # data = cm_ts
+    pct_factor = 100 if as_pct else 1
+
     length  = confusion_matrix.shape[1]
     cm_side = int(np.sqrt(length))
 
-    n_classes = len(confusion_matrix)
+    n_rounds = len(confusion_matrix)
 
-    accuracies    = [0] * n_classes
-    specifities   = [0] * n_classes
-    sensibilities = [0] * n_classes
-    f1_scores     = [0] * n_classes
+    accuracies    = np.zeros(shape=(n_rounds,))
+    specifities   = np.zeros(shape=(n_rounds,))
+    sensibilities = np.zeros(shape=(n_rounds,))
+    f1_scores     = np.zeros(shape=(n_rounds,))
 
-    for i in range(n_classes):
+    for i in range(n_rounds):
         cm_ith = np.reshape(confusion_matrix[i], (cm_side, cm_side))
-        accuracies[i]    = cm2acc(cm_ith)
-        sensibilities[i] = cm2results(cm_ith, cm2sen)
-        specifities[i]   = cm2results(cm_ith, cm2esp)
-        f1_scores[i]     = cm2results(cm_ith, cm2f1)
+        accuracies[i]    = pct_factor*cm2acc(cm_ith)
+        sensibilities[i] = pct_factor*cm2results(cm_ith, cm2sen)
+        specifities[i]   = pct_factor*cm2results(cm_ith, cm2esp)
+        f1_scores[i]     = pct_factor*cm2results(cm_ith, cm2f1)
+
+    if as_list:
+        return accuracies.tolist(), specifities.tolist(), sensibilities.tolist(), f1_scores.tolist()
 
     return accuracies, specifities, sensibilities, f1_scores
 
@@ -58,9 +64,9 @@ def cm2results(cm, metric_func):
         metric_results = [None] * n_classes
         for i in range(n_classes):
             tn[i] = cm[i][i]
-            fp[i] = np.sum(cm[i, :]) - tn
-            fn[i] = np.sum(cm[:, i]) - tn
-            tp[i] = np.trace(cm) - tn
+            fp[i] = np.sum(cm[i, :]) - tn[i]
+            fn[i] = np.sum(cm[:, i]) - tn[i]
+            tp[i] = np.trace(cm) - tn[i]
             metric_results[i] = metric_func(tn[i], fp[i], fn[i], tp[i])
 
         return np.mean(metric_results)
