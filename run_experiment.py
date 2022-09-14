@@ -5,6 +5,11 @@ from devcode.simulation.pipeline import ExperimentHandler
 from devcode.utils import FileUtils
 
 if __name__ == '__main__':
+    """
+        Run pipeline simulation to generate part2 results in manuscript.
+        
+        Note: Set the devcode.GLOBAL_BASE_PATH for selecting the directory where the results will be saved.
+    """
     import warnings
     warnings.filterwarnings('ignore')
 

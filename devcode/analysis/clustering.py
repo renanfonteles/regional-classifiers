@@ -305,7 +305,7 @@ def k_opt_hitrates_per_dataset(df, datasets):
     return hitrates_per_dataset, metric_names
 
 
-def _hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=False, save_flag=False):
+def hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=False, save_flag=False):
     for model_type in [result_key]:  # ['local', 'regional']:
         n_metrics = int((len(df[model_type].columns[6:-4]) - 1) / 4)
 
@@ -350,7 +350,7 @@ def _hitrate_histogram_per_metric(df, dataset_name, result_key, show_flag=False,
             fig.write_image(f"{CLUSTERING_SAVE_IMAGE_PATH}/r-lssvm_metrics-k_opt-hit-frequency_{dataset_name}.pdf")
 
 
-def _k_optimal_histogram(df, dataset_name, result_key, show_flag=False, save_flag=False):
+def k_optimal_histogram(df, dataset_name, result_key, show_flag=False, save_flag=False):
     """
 
     Parameters
